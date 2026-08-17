@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="2263" viewBox="0 0 1600 2263">
+  <defs>
+    <!-- Top-right blue glow -->
+    <radialGradient id="glow-tr" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#3580B1" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#3580B1" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Bottom-left muted glow -->
+    <radialGradient id="glow-bl" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#80B8D8" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#80B8D8" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Subtle center warmth -->
+    <radialGradient id="glow-center" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#162D45" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#162D45" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Base navy -->
+  <rect width="1600" height="2263" fill="#0C2340"/>
+
+  <!-- Center depth layer -->
+  <ellipse cx="800" cy="1131" rx="900" ry="1100" fill="url(#glow-center)"/>
+
+  <!-- Top-right radial glow -->
+  <ellipse cx="1450" cy="-60" rx="780" ry="780" fill="url(#glow-tr)"/>
+
+  <!-- Secondary top-right bloom -->
+  <ellipse cx="1300" cy="200" rx="500" ry="500" fill="url(#glow-tr)" opacity="0.5"/>
+
+  <!-- Bottom-left radial glow -->
+  <ellipse cx="-60" cy="2320" rx="600" ry="600" fill="url(#glow-bl)"/>
+</svg>

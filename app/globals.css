@@ -1,26 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Color tokens */
+  --color-navy: oklch(26% .09 256);
+  --color-navy-foreground: oklch(97% .01 248);
+  --color-sky: oklch(78% .09 233);
+  --color-sky-soft: oklch(96.5% .02 234);
+  --color-primary: oklch(55% .15 245);
+  --color-primary-foreground: oklch(100% 0 0);
+  --color-background: oklch(100% 0 0);
+  --color-card: oklch(100% 0 0);
+  --color-border: oklch(90% .02 246);
+  --color-muted-foreground: oklch(55% .04 250);
+  --color-foreground: oklch(18% .05 261);
+
+  /* Font tokens */
+  --font-sans: 'Barlow', system-ui, sans-serif;
+  --font-display: 'Barlow Condensed', system-ui, sans-serif;
+
+  /* Shadow tokens */
+  --shadow-panel: 0 18px 45px -28px oklch(28% .09 250 / .55);
+  --shadow-lift: 0 26px 60px -30px oklch(28% .09 250 / .7);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { overflow-x: hidden; }
+  ::selection {
+    background-color: oklch(55% .15 245);
+    color: white;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .section-eyebrow {
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.08); }
+}
+
+.animate-pulse-glow { animation: pulse-glow 5s ease-in-out infinite; }
+
+.glass {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.hero-grid {
+  background-image:
+    linear-gradient(oklch(97% .01 248 / .04) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(97% .01 248 / .04) 1px, transparent 1px);
+  background-size: 64px 64px;
 }

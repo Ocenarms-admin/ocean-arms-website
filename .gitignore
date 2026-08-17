@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude Code memory (contains personal data)
+.claude/
+
+# Skills lock
+skills-lock.json
+
+# Screenshots and design artifacts
+screencapture-*.png
+
+# Brochure PDF (large binary)
+brochure_organized.pdf

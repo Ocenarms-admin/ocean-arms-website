@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ocean Arms — Design System</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --c-bg:      #F7FBFF;
+    --c-fg:      #3A5270;
+    --c-primary: #3580B1;
+    --c-muted:   #80B8D8;
+    --c-deep:    #0C2340;
+    --c-s100:    #EBF4FA;
+    --c-s200:    #C6DFF0;
+    --c-s300:    #99C4E0;
+    --font-serif:   'Playfair Display', Georgia, serif;
+    --font-sans:    'Inter', system-ui, sans-serif;
+    --font-display: 'Montserrat', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-sans);
+    background: #fff;
+    color: var(--c-fg);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── Print setup ── */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  @media print {
+    .page-break { page-break-before: always; }
+    .no-break   { page-break-inside: avoid; }
+    body        { font-size: 11px; }
+  }
+
+  /* ── Layout ── */
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ─────────────────────────────
+     COVER PAGE
+  ───────────────────────────── */
+  .cover {
+    width: 210mm;
+    height: 297mm;
+    background: var(--c-deep);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3rem 3.5rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -120px; right: -120px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(53,128,177,0.25) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 380px; height: 380px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(128,184,216,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover-top { position: relative; z-index: 1; }
+  .cover-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(53,128,177,0.2);
+    border: 1px solid rgba(128,184,216,0.3);
+    border-radius: 9999px;
+    padding: 0.4rem 1rem;
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+    margin-bottom: 2.5rem;
+  }
+  .cover h1 {
+    font-family: var(--font-serif);
+    font-size: 3.8rem;
+    font-weight: 500;
+    color: #F7FBFF;
+    line-height: 1.08;
+    margin-bottom: 1rem;
+  }
+  .cover h1 em { color: var(--c-muted); font-style: italic; }
+  .cover-sub {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 300;
+    color: rgba(247,251,255,0.6);
+    line-height: 1.65;
+    max-width: 400px;
+    margin-bottom: 2.5rem;
+  }
+  .cover-divider {
+    width: 60px; height: 2px;
+    background: linear-gradient(90deg, var(--c-muted), var(--c-primary));
+    border-radius: 9999px;
+    margin-bottom: 2.5rem;
+  }
+  .cover-meta {
+    display: flex; gap: 2.5rem;
+  }
+  .cover-meta-item {
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .cover-meta-label {
+    font-family: var(--font-display);
+    font-size: 0.58rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+  .cover-meta-value {
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: rgba(247,251,255,0.8);
+  }
+  .cover-bottom {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 1.5rem;
+  }
+  .cover-logo {
+    display: flex; align-items: baseline; gap: 4px;
+  }
+  .cover-logo-ocean {
+    font-family: var(--font-display);
+    font-weight: 300;
+    letter-spacing: 0.28em;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    color: #F7FBFF;
+  }
+  .cover-logo-arms {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: 1.15rem;
+    color: #F7FBFF;
+    position: relative;
+  }
+  .cover-logo-arms::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; right: -5px;
+    width: 115%; height: 2px;
+    background: linear-gradient(90deg, var(--c-muted), var(--c-primary));
+    border-radius: 9999px;
+    transform: rotate(-5deg);
+  }
+  .cover-page-label {
+    font-family: var(--font-display);
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(247,251,255,0.35);
+  }
+  .cover-toc {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 2.5rem;
+    margin-top: 2.5rem;
+  }
+  .cover-toc-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .cover-toc-num {
+    font-family: var(--font-display);
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--c-muted);
+    width: 18px;
+    flex-shrink: 0;
+  }
+  .cover-toc-name {
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 300;
+    color: rgba(247,251,255,0.65);
+  }
+
+  /* ── Content pages ── */
+  .content-page {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 2.5rem 3rem 3rem;
+    background: #fff;
+    position: relative;
+  }
+  .content-page + .content-page { border-top: none; }
+
+  /* ── Page header strip ── */
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 2.5rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid var(--c-s200);
+  }
+  .page-header-left {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .page-header-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--c-primary);
+  }
+  .page-header-title {
+    font-family: var(--font-display);
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--c-muted);
+  }
+  .page-header-brand {
+    font-family: var(--font-display);
+    font-size: 0.58rem;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--c-s300);
+  }
+
+  /* ── Section headings ── */
+  .section-label {
+    font-family: var(--font-display);
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--c-primary);
+    margin-bottom: 0.4rem;
+  }
+  .section-title {
+    font-family: var(--font-serif);
+    font-size: 1.7rem;
+    font-weight: 500;
+    color: var(--c-deep);
+    margin-bottom: 0.35rem;
+    line-height: 1.15;
+  }
+  .section-title em { color: var(--c-primary); font-style: italic; }
+  .section-desc {
+    font-family: var(--font-sans);
+    font-size: 0.82rem;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--c-fg);
+    margin-bottom: 1.5rem;
+    max-width: 560px;
+  }
+  .section-divider {
+    width: 40px; height: 2.5px;
+    background: linear-gradient(90deg, var(--c-primary), var(--c-muted));
+    border-radius: 9999px;
+    margin-bottom: 1.75rem;
+  }
+
+  /* ── Color swatches ── */
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .color-card { border-radius: 1rem; overflow: hidden; border: 1px solid var(--c-s200); }
+  .color-swatch { height: 70px; }
+  .color-info { padding: 0.75rem; background: white; }
+  .color-name {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-deep);
+    margin-bottom: 2px;
+  }
+  .color-hex {
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: var(--c-fg);
+    margin-bottom: 2px;
+  }
+  .color-usage {
+    font-family: var(--font-sans);
+    font-size: 0.64rem;
+    font-weight: 300;
+    color: var(--c-muted);
+    line-height: 1.4;
+  }
+
+  /* ── Typography specimens ── */
+  .type-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 2rem; }
+  .type-card {
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--c-s200);
+    border-radius: 1rem;
+    background: var(--c-s100);
+    display: grid; grid-template-columns: 180px 1fr; gap: 1.5rem; align-items: center;
+  }
+  .type-meta { display: flex; flex-direction: column; gap: 3px; }
+  .type-meta-label {
+    font-family: var(--font-display);
+    font-size: 0.58rem; font-weight: 600;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--c-primary);
+  }
+  .type-meta-detail {
+    font-family: var(--font-sans);
+    font-size: 0.7rem; font-weight: 300;
+    color: var(--c-fg); line-height: 1.45;
+  }
+
+  /* ── Spec tables ── */
+  .spec-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+  .spec-table th {
+    font-family: var(--font-display);
+    font-size: 0.6rem; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--c-muted);
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--c-s100);
+    border-bottom: 1px solid var(--c-s200);
+  }
+  .spec-table td {
+    font-family: var(--font-sans);
+    font-size: 0.75rem; font-weight: 300;
+    color: var(--c-fg);
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid var(--c-s200);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .spec-table tr:last-child td { border-bottom: none; }
+  .spec-table td:first-child { font-weight: 500; color: var(--c-deep); }
+  .spec-table td code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.68rem;
+    background: var(--c-s100);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--c-primary);
+  }
+
+  /* ── Component previews ── */
+  .component-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+  .component-card {
+    border: 1px solid var(--c-s200);
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+  .component-preview {
+    padding: 1.5rem;
+    background: var(--c-s100);
+    display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+    gap: 0.75rem; min-height: 80px;
+  }
+  .component-preview.dark { background: var(--c-deep); }
+  .component-label {
+    padding: 0.6rem 0.85rem;
+    background: white;
+    font-family: var(--font-display);
+    font-size: 0.6rem; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--c-fg);
+    border-top: 1px solid var(--c-s200);
+  }
+
+  /* Simulated UI elements */
+  .btn-primary {
+    font-family: var(--font-display); font-weight: 600; font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--c-primary); color: white;
+    border: none; border-radius: 9999px; padding: 0.6rem 1.4rem;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .btn-outline {
+    font-family: var(--font-display); font-weight: 500; font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    background: transparent; color: var(--c-deep);
+    border: 1px solid var(--c-s200); border-radius: 9999px; padding: 0.6rem 1.4rem;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .btn-dark {
+    font-family: var(--font-display); font-weight: 600; font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--c-deep); color: white;
+    border: none; border-radius: 9999px; padding: 0.6rem 1.4rem;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .badge {
+    font-family: var(--font-display); font-weight: 500; font-size: 0.58rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--c-s100); color: var(--c-fg);
+    padding: 0.3rem 0.7rem; border-radius: 9999px;
+    border: 1px solid var(--c-s200);
+    display: inline-block;
+  }
+  .badge-primary {
+    background: rgba(53,128,177,0.12);
+    color: var(--c-primary);
+    border-color: rgba(53,128,177,0.25);
+    font-family: var(--font-display); font-weight: 500; font-size: 0.58rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.3rem 0.7rem; border-radius: 9999px;
+    display: inline-block;
+  }
+
+  /* ── Annotation boxes ── */
+  .annotation {
+    display: flex; gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: var(--c-s100);
+    border-left: 3px solid var(--c-primary);
+    border-radius: 0 0.75rem 0.75rem 0;
+    margin-bottom: 1rem;
+  }
+  .annotation-icon {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--c-primary);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+    font-size: 0.6rem; color: white; font-weight: 700;
+  }
+  .annotation-text {
+    font-family: var(--font-sans); font-size: 0.75rem;
+    font-weight: 300; line-height: 1.55; color: var(--c-deep);
+  }
+  .annotation-text strong { font-weight: 600; }
+
+  /* ── Section breakdown cards ── */
+  .section-breakdown {
+    border: 1px solid var(--c-s200);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  .section-breakdown-header {
+    padding: 1rem 1.25rem;
+    background: var(--c-deep);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-breakdown-name {
+    font-family: var(--font-serif);
+    font-size: 1rem; font-weight: 500;
+    color: #F7FBFF;
+  }
+  .section-breakdown-tag {
+    font-family: var(--font-display);
+    font-size: 0.55rem; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--c-muted);
+    background: rgba(255,255,255,0.08);
+    padding: 0.25rem 0.65rem; border-radius: 9999px;
+  }
+  .section-breakdown-body {
+    padding: 1.1rem 1.25rem;
+    background: white;
+  }
+  .component-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+  .component-list li {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-family: var(--font-sans); font-size: 0.75rem;
+    font-weight: 300; color: var(--c-fg); line-height: 1.45;
+  }
+  .component-list li::before {
+    content: '';
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--c-primary);
+    flex-shrink: 0; margin-top: 6px;
+  }
+  .component-list li strong { font-weight: 600; color: var(--c-deep); }
+
+  /* ── Animation table ── */
+  .anim-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
+  .anim-card {
+    padding: 1rem;
+    border: 1px solid var(--c-s200);
+    border-radius: 1rem;
+    background: white;
+  }
+  .anim-name {
+    font-family: var(--font-display); font-size: 0.65rem;
+    font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--c-deep);
+    margin-bottom: 4px;
+  }
+  .anim-detail {
+    font-family: var(--font-sans); font-size: 0.7rem;
+    font-weight: 300; color: var(--c-fg); line-height: 1.45;
+  }
+
+  /* ── Spacing scale ── */
+  .spacing-grid { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+  .spacing-row { display: flex; align-items: center; gap: 1rem; }
+  .spacing-label {
+    font-family: var(--font-display); font-size: 0.6rem;
+    font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--c-muted); width: 50px; flex-shrink: 0;
+  }
+  .spacing-bar-wrap { flex: 1; display: flex; align-items: center; gap: 8px; }
+  .spacing-bar { height: 6px; background: var(--c-primary); border-radius: 9999px; opacity: 0.7; }
+  .spacing-val {
+    font-family: var(--font-sans); font-size: 0.7rem;
+    font-weight: 400; color: var(--c-fg); white-space: nowrap;
+  }
+
+  /* ── Two column layout ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+
+  /* ── Inline token pill ── */
+  .token {
+    font-family: 'Courier New', monospace;
+    font-size: 0.65rem;
+    background: var(--c-s100);
+    color: var(--c-primary);
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--c-s200);
+    display: inline-block;
+  }
+
+  /* ── Page footer ── */
+  .page-footer {
+    position: absolute; bottom: 1.5rem; left: 3rem; right: 3rem;
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid var(--c-s200);
+    padding-top: 0.75rem;
+  }
+  .page-footer-brand {
+    font-family: var(--font-display); font-size: 0.55rem;
+    font-weight: 400; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--c-s300);
+  }
+  .page-footer-pg {
+    font-family: var(--font-display); font-size: 0.55rem;
+    font-weight: 500; letter-spacing: 0.1em;
+    color: var(--c-s300);
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     PAGE 1 — COVER
+═══════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="cover-badge">⬡ Design System — Confidential Client Document</div>
+
+    <h1>Ocean Arms<br/><em>Design System</em></h1>
+    <p class="cover-sub">A comprehensive visual and interaction specification for the Ocean Arms Technical Services LLC website — covering design tokens, section anatomy, components, and motion guidelines.</p>
+    <div class="cover-divider"></div>
+
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Project</span>
+        <span class="cover-meta-value">New Template v2</span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Prepared for</span>
+        <span class="cover-meta-value">Ocean Arms Technical Services LLC</span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Date</span>
+        <span class="cover-meta-value">August 2026</span>
+      </div>
+      <div class="cover-meta-item">
+        <span class="cover-meta-label">Version</span>
+        <span class="cover-meta-value">1.0</span>
+      </div>
+    </div>
+
+    <div class="cover-toc">
+      <div class="cover-toc-item"><span class="cover-toc-num">01</span><span class="cover-toc-name">Design Tokens</span></div>
+      <div class="cover-toc-item"><span class="cover-toc-num">06</span><span class="cover-toc-name">Rope Access / Services</span></div>
+      <div class="cover-toc-item"><span class="cover-toc-num">02</span><span class="cover-toc-name">Typography System</span></div>
+      <div class="cover-toc-item"><span class="cover-toc-num">07</span><span class="cover-toc-name">Vision & Mission Cards</span></div>
+      <div class="cover-toc-item"><span class="cover-toc-num">03</span><span class="cover-toc-name">Spacing & Layout</span></div>
+      <div class="cover-toc-item"><span class="cover-toc-num">08</span><span class="cover-toc-name">Industries</span></div>
+      <div class="cover-toc-item"><span class="cover-toc-num">04</span><span class="cover-toc-name">Navbar & Hero</span></div>
+      <div class="cover-toc-item"><span class="cover-toc-num">09</span><span class="cover-toc-name">Why Choose Us</span></div>
+      <div class="cover-toc-item"><span class="cover-toc-num">05</span><span class="cover-toc-name">Core Values / Features</span></div>
+      <div class="cover-toc-item"><span class="cover-toc-num">10</span><span class="cover-toc-name">CTA, Footer & Motion</span></div>
+    </div>
+  </div>
+
+  <div class="cover-bottom">
+    <div class="cover-logo">
+      <span class="cover-logo-ocean">OCEAN</span>
+      <span class="cover-logo-arms">Arms</span>
+    </div>
+    <span class="cover-page-label">Design System · Internal Reference</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     PAGE 2 — DESIGN TOKENS: COLOUR
+═══════════════════════════════════════ -->
+<div class="content-page page-break">
+  <div class="page-header">
+    <div class="page-header-left"><div class="page-header-dot"></div><span class="page-header-title">01 — Design Tokens · Colour</span></div>
+    <span class="page-header-brand">Ocean Arms Design System</span>
+  </div>
+
+  <div class="section-label">Foundation</div>
+  <div class="section-title">Colour <em>Palette</em></div>
+  <div class="section-divider"></div>
+  <p class="section-desc">All colours are defined as CSS custom properties on <code style="font-family:monospace;font-size:0.75rem;background:var(--c-s100);padding:1px 5px;border-radius:4px;color:var(--c-primary);">:root</code>. Use tokens — never hardcode hex values in components.</p>
+
+  <div class="color-grid">
+    <div class="color-card">
+      <div class="color-swatch" style="background:#F7FBFF;border-bottom:1px solid var(--c-s200);"></div>
+      <div class="color-info">
+        <div class="color-name">Background</div>
+        <div class="color-hex">#F7FBFF · <code style="font-family:monospace;font-size:0.65rem;">--c-bg</code></div>
+        <div class="color-usage">Page background, section fills</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:#0C2340;"></div>
+      <div class="color-info">
+        <div class="color-name">Deep Navy</div>
+        <div class="color-hex">#0C2340 · <code style="font-family:monospace;font-size:0.65rem;">--c-deep</code></div>
+        <div class="color-usage">Primary text, dark cards, nav CTA, footer</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:#3580B1;"></div>
+      <div class="color-info">
+        <div class="color-name">Ocean Blue</div>
+        <div class="color-hex">#3580B1 · <code style="font-family:monospace;font-size:0.65rem;">--c-primary</code></div>
+        <div class="color-usage">Buttons, links, accents, icons</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:#3A5270;"></div>
+      <div class="color-info">
+        <div class="color-name">Foreground</div>
+        <div class="color-hex">#3A5270 · <code style="font-family:monospace;font-size:0.65rem;">--c-fg</code></div>
+        <div class="color-usage">Body copy, paragraph text</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:#80B8D8;"></div>
+      <div class="color-info">
+        <div class="color-name">Muted Blue</div>
+        <div class="color-hex">#80B8D8 · <code style="font-family:monospace;font-size:0.65rem;">--c-muted</code></div>
+        <div class="color-usage">Labels, overlines, secondary icons</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:#EBF4FA;border-bottom:1px solid var(--c-s200);"></div>
+      <div class="color-info">
+        <div class="color-name">Surface 100</div>
+        <div class="color-hex">#EBF4FA · <code style="font-family:monospace;font-size:0.65rem;">--c-s100</code></div>
+        <div class="color-usage">Alternate section BG, icon circle fills</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:#C6DFF0;"></div>
+      <div class="color-info">
+        <div class="color-name">Surface 200</div>
+        <div class="color-hex">#C6DFF0 · <code style="font-family:monospace;font-size:0.65rem;">--c-s200</code></div>
+        <div class="color-usage">Borders, dividers, card strokes</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:#99C4E0;"></div>
+      <div class="color-info">
+        <div class="color-name">Surface 300</div>
+        <div class="color-hex">#99C4E0 · <code style="font-family:monospace;font-size:0.65rem;">--c-s300</code></div>
+        <div class="color-usage">Scrollbar thumb, subtle UI chrome</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation">
+    <div class="annotation-icon">!</div>
+    <p class="annotation-text"><strong>Dark mode note:</strong> This design system is light-mode primary. Dark sections (footer, CTA, mission card back, certifications card) use <code style="font-family:monospace;font-size:0.72rem;">--c-deep</code> (#0C2340) or #162D45 as surfaces with <code style="font-family:monospace;font-size:0.72rem;">#FAFAFA / rgba(250,250,250,0.6)</code> for text. Minimum contrast ratio maintained at 4.5:1 per WCAG AA.</p>
+  </div>
+
+  <div class="section-label" style="margin-top:1rem;">Usage Roles</div>
+  <table class="spec-table">
+    <thead>
+      <tr><th>Token</th><th>Hex</th><th>Role</th><th>Used In</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>--c-bg</code></td><td>#F7FBFF</td><td>Page background</td><td>Hero, About, Features, Why Choose Us sections</td></tr>
+      <tr><td><code>--c-deep</code></td><td>#0C2340</td><td>Primary text / dark surfaces</td><td>Headings, navbar CTA, Vision card back, footer</td></tr>
+      <tr><td><code>--c-primary</code></td><td>#3580B1</td><td>Brand accent</td><td>CTA buttons, icon colours, dividers, hover states</td></tr>
+      <tr><td><code>--c-fg</code></td><td>#3A5270</td><td>Body text</td><td>Paragraphs, nav links, card body copy</td></tr>
+      <tr><td><code>--c-muted</code></td><td>#80B8D8</td><td>Secondary / overline</td><td>Section labels, overlines, secondary icons</td></tr>
+      <tr><td><code>--c-s100</code></td><td>#EBF4FA</td><td>Alternate surface</td><td>Industries section BG, icon circles, about callout</td></tr>
+      <tr><td><code>--c-s200</code></td><td>#C6DFF0</td><td>Borders</td><td>Card borders, table dividers, pill strokes</td></tr>
+      <tr><td><code>--c-s300</code></td><td>#99C4E0</td><td>Subtle chrome</td><td>Scrollbar, milestone connector lines</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer">
+    <span class="page-footer-brand">Ocean Arms Technical Services LLC</span>
+    <span class="page-footer-pg">Page 02</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     PAGE 3 — TYPOGRAPHY
+═══════════════════════════════════════ -->
+<div class="content-page page-break">
+  <div class="page-header">
+    <div class="page-header-left"><div class="page-header-dot"></div><span class="page-header-title">02 — Typography System</span></div>
+    <span class="page-header-brand">Ocean Arms Design System</span>
+  </div>
+
+  <div class="section-label">Foundation</div>
+  <div class="section-title">Type <em>Scale</em></div>
+  <div class="section-divider"></div>
+
+  <div class="type-grid">
+    <div class="type-card">
+      <div class="type-meta">
+        <span class="type-meta-label">Display / H1</span>
+        <span class="type-meta-detail">Playfair Display<br/>Weight 600 / Italic 400<br/>5.2rem · line-height 1.04<br/>Clamp: 3.2rem → 5.2rem</span>
+      </div>
+      <div style="font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:600;color:var(--c-deep);line-height:1.04;">Marine &amp; Industrial<br/><em style="font-weight:400;color:var(--c-primary);">Solutions.</em></div>
+    </div>
+    <div class="type-card">
+      <div class="type-meta">
+        <span class="type-meta-label">Section H2</span>
+        <span class="type-meta-detail">Playfair Display<br/>Weight 500<br/>3rem · line-height 1.15<br/>Clamp: 2rem → 3rem</span>
+      </div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:500;color:var(--c-deep);">Our <em style="color:var(--c-primary);font-style:italic;">Vision &amp; Mission</em></div>
+    </div>
+    <div class="type-card">
+      <div class="type-meta">
+        <span class="type-meta-label">Card H3</span>
+        <span class="type-meta-detail">Playfair Display<br/>Weight 500–600<br/>1.35rem – 1.6rem<br/>line-height 1.25</span>
+      </div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:500;color:var(--c-deep);">What drives every decision we make</div>
+    </div>
+    <div class="type-card">
+      <div class="type-meta">
+        <span class="type-meta-label">Body</span>
+        <span class="type-meta-detail">Inter<br/>Weight 300<br/>0.88rem – 1.05rem<br/>line-height 1.7 – 1.85</span>
+      </div>
+      <div style="font-family:'Inter',sans-serif;font-size:0.88rem;font-weight:300;color:var(--c-fg);line-height:1.7;">Ocean Arms Technical Services LLC delivers integrated technical solutions across Oil &amp; Gas, Marine, Power, and Civil sectors.</div>
+    </div>
+    <div class="type-card">
+      <div class="type-meta">
+        <span class="type-meta-label">Overline / Label</span>
+        <span class="type-meta-detail">Montserrat<br/>Weight 500<br/>0.65rem<br/>Letter-spacing 0.22em<br/>Uppercase</span>
+      </div>
+      <div style="font-family:'Montserrat',sans-serif;font-size:0.65rem;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--c-muted);">Who We Are</div>
+    </div>
+    <div class="type-card">
+      <div class="type-meta">
+        <span class="type-meta-label">UI / Nav</span>
+        <span class="type-meta-detail">Montserrat<br/>Weight 500–600<br/>0.7rem – 0.72rem<br/>Letter-spacing 0.1–0.14em<br/>Uppercase</span>
+      </div>
+      <div style="display:flex;gap:1rem;align-items:center;">
+        <span style="font-family:'Montserrat',sans-serif;font-size:0.7rem;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--c-fg);">Services</span>
+        <span style="font-family:'Montserrat',sans-serif;font-size:0.7rem;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--c-fg);">Industries</span>
+        <span class="btn-dark">Request a Quote</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:0.5rem;">Font Stack Reference</div>
+  <table class="spec-table">
+    <thead>
+      <tr><th>Token</th><th>Font Family</th><th>Weights Used</th><th>Role</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>--font-serif</code></td><td>Playfair Display, Georgia, serif</td><td>400i, 500, 600</td><td>All headings H1–H3, card titles, logo "Arms"</td></tr>
+      <tr><td><code>--font-sans</code></td><td>Inter, system-ui, sans-serif</td><td>300, 400, 500</td><td>Body copy, nav links, descriptions, footer text</td></tr>
+      <tr><td><code>--font-display</code></td><td>Montserrat, sans-serif</td><td>300, 400, 500, 600</td><td>Overlines, badges, CTA buttons, nav items, logo "OCEAN"</td></tr>
+      <tr><td><code>--font-accent</code></td><td>Instrument Serif, Georgia, serif</td><td>400</td><td>Reserved accent / pull-quote usage</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer">
+    <span class="page-footer-brand">Ocean Arms Technical Services LLC</span>
+    <span class="page-footer-pg">Page 03</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     PAGE 4 — SPACING, LAYOUT & COMPONENTS
+═══════════════════════════════════════ -->
+<div class="content-page page-break">
+  <div class="page-header">
+    <div class="page-header-left"><div class="page-header-dot"></div><span class="page-header-title">03 — Spacing, Layout &amp; Core Components</span></div>
+    <span class="page-header-brand">Ocean Arms Design System</span>
+  </div>
+
+  <div class="two-col" style="gap:2rem;">
+    <div>
+      <div class="section-label">Layout</div>
+      <div class="section-title" style="font-size:1.35rem;">Grid &amp; <em>Spacing</em></div>
+      <div class="section-divider"></div>
+      <table class="spec-table">
+        <thead><tr><th>Property</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Max content width</td><td>1280px</td></tr>
+          <tr><td>Horizontal padding</td><td>0 1.5rem (24px)</td></tr>
+          <tr><td>Primary grid</td><td>2-column, 5rem gap</td></tr>
+          <tr><td>Card grid</td><td>2-column, 1.5rem gap</td></tr>
+          <tr><td>3-column grid</td><td>repeat(3, 1fr), 0 gap</td></tr>
+          <tr><td>Section padding</td><td>7rem 0 (112px top/bottom)</td></tr>
+          <tr><td>CTA section padding</td><td>5rem 0</td></tr>
+          <tr><td>Footer padding</td><td>5rem 0 3rem</td></tr>
+          <tr><td>Navbar height</td><td>80px fixed</td></tr>
+        </tbody>
+      </table>
+
+      <div class="section-label" style="margin-top:0.75rem;">Border Radius Scale</div>
+      <table class="spec-table">
+        <thead><tr><th>Usage</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Section cards (large)</td><td>2rem (32px)</td></tr>
+          <tr><td>Image cards, industry</td><td>1.75rem (28px)</td></tr>
+          <tr><td>Sub-cards, certifications</td><td>1.5rem (24px)</td></tr>
+          <tr><td>Small cards / panels</td><td>1rem – 1.25rem</td></tr>
+          <tr><td>Buttons / pills / badges</td><td>9999px (full round)</td></tr>
+          <tr><td>Social icons, icon circles</td><td>50% (circle)</td></tr>
+          <tr><td>Floating badge</td><td>0.75rem (12px)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div>
+      <div class="section-label">Components</div>
+      <div class="section-title" style="font-size:1.35rem;">Buttons &amp; <em>Badges</em></div>
+      <div class="section-divider"></div>
+
+      <div class="component-grid">
+        <div class="component-card">
+          <div class="component-preview">
+            <span class="btn-primary">Request a Quotation</span>
+          </div>
+          <div class="component-label">Primary Button</div>
+        </div>
+        <div class="component-card">
+          <div class="component-preview">
+            <span class="btn-outline">Industries We Serve</span>
+          </div>
+          <div class="component-label">Outline Button</div>
+        </div>
+        <div class="component-card">
+          <div class="component-preview dark">
+            <span class="btn-dark" style="background:var(--c-primary);">Request a Quote</span>
+          </div>
+          <div class="component-label">Dark-surface CTA</div>
+        </div>
+        <div class="component-card">
+          <div class="component-preview dark">
+            <span style="font-family:'Montserrat',sans-serif;font-size:0.65rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:rgba(245,245,244,0.85);border:1px solid rgba(255,255,255,0.2);border-radius:9999px;padding:0.5rem 1.2rem;">Call Us 24/7</span>
+          </div>
+          <div class="component-label">Ghost Button (dark)</div>
+        </div>
+      </div>
+
+      <div class="component-grid">
+        <div class="component-card">
+          <div class="component-preview" style="flex-wrap:wrap;">
+            <span class="badge">IRATA Certified</span>
+            <span class="badge">GCC Coverage</span>
+            <span class="badge">ADNOC Approved</span>
+          </div>
+          <div class="component-label">Default Badge</div>
+        </div>
+        <div class="component-card">
+          <div class="component-preview" style="flex-wrap:wrap;">
+            <span class="badge-primary">8 Services</span>
+            <span class="badge-primary">Safety</span>
+            <span class="badge-primary">Excellence</span>
+          </div>
+          <div class="component-label">Accent Badge</div>
+        </div>
+      </div>
+
+      <div class="annotation">
+        <div class="annotation-icon">i</div>
+        <p class="annotation-text"><strong>Button hover:</strong> Primary scales to 1.04. All transitions use <code style="font-family:monospace;font-size:0.7rem;">0.2s ease</code>. Pulse glow ring on Hero CTA uses a 2.2s repeating radial animation (rgba(53,128,177,0.55) border).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span class="page-footer-brand">Ocean Arms Technical Services LLC</span>
+    <span class="page-footer-pg">Page 04</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     PAGE 5 — NAVBAR & HERO
+═══════════════════════════════════════ -->
+<div class="content-page page-break">
+  <div class="page-header">
+    <div class="page-header-left"><div class="page-header-dot"></div><span class="page-header-title">04 — Navbar &amp; Hero Section</span></div>
+    <span class="page-header-brand">Ocean Arms Design System</span>
+  </div>
+
+  <div class="section-breakdown no-break">
+    <div class="section-breakdown-header">
+      <span class="section-breakdown-name">Navbar</span>
+      <span class="section-breakdown-tag">Fixed · Height 80px</span>
+    </div>
+    <div class="section-breakdown-body">
+      <ul class="component-list">
+        <li><strong>Logo:</strong> "OCEAN" in Montserrat Light (letter-spacing 0.28em) + "Arms" in Playfair Display 500 with a gradient underline stroke (rotate -5deg, rgba muted→primary)</li>
+        <li><strong>Nav links:</strong> 4 items — Services, Industries, Capabilities, FAQ. Montserrat 500, 0.7rem, 0.14em tracking, uppercase. Hover transitions colour from <span class="token">--c-fg</span> to <span class="token">--c-deep</span></li>
+        <li><strong>CTA button:</strong> "Request a Quote" — Montserrat 600, background <span class="token">--c-deep</span>, rounded pill (9999px), hover shifts to <span class="token">--c-primary</span> + scale(1.03)</li>
+        <li><strong>Scroll behaviour:</strong> Border-bottom transitions from 25% to 90% opacity on <span class="token">--c-s200</span> at scrollY &gt; 40px. Backdrop: blur(12px) on rgba(247,251,255,0.92)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-breakdown no-break" style="margin-top:1rem;">
+    <div class="section-breakdown-header">
+      <span class="section-breakdown-name">Hero Section</span>
+      <span class="section-breakdown-tag">100vh · 2-column grid · 5rem gap</span>
+    </div>
+    <div class="section-breakdown-body">
+      <div class="two-col" style="gap:1.5rem;margin-bottom:0;">
+        <div>
+          <p style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--c-primary);margin-bottom:0.5rem;">LEFT COLUMN — Text</p>
+          <ul class="component-list">
+            <li><strong>Overline:</strong> Solar verified icon + "Dubai, United Arab Emirates" · Montserrat 500, 0.65rem, <span class="token">--c-muted</span></li>
+            <li><strong>H1:</strong> 3 stacked lines with staggered <code style="font-family:monospace;font-size:0.7rem;">cta-bounce</code> animation (delays: 0.05s, 0.22s, 0.40s). "Marine &amp;" and "Industrial" in weight 600 deep navy; "Solutions." in weight 400 italic <span class="token">--c-primary</span></li>
+            <li><strong>Body copy:</strong> Inter 300, 1.05rem, line-height 1.75, max-width 440px</li>
+            <li><strong>CTA row:</strong> Primary button (pulse-glow class) + Outline button, flex row with 1rem gap</li>
+            <li><strong>Stats row:</strong> 4 items — 24/7, IRATA, 4 Industries, GCC. Serif number 1.7rem 600 deep, display label 0.62rem uppercase muted</li>
+          </ul>
+        </div>
+        <div>
+          <p style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--c-primary);margin-bottom:0.5rem;">RIGHT COLUMN — Photo</p>
+          <ul class="component-list">
+            <li><strong>Container:</strong> max-width 560px, position relative. Decorative accent ring: inset -14px, border 1px <span class="token">--c-s200</span>, radius 2rem, z-index 0</li>
+            <li><strong>Image:</strong> <code style="font-family:monospace;font-size:0.7rem;">/assets/ocean-arms-hero-image.png</code>, 420px height, object-fit cover, border-radius 1.75rem, box-shadow 0 32px 80px rgba(12,35,64,0.18)</li>
+            <li><strong>Bottom overlay:</strong> linear-gradient top-to-bottom rgba(12,35,64,0.35) → transparent, height 40%, z-index 2</li>
+            <li><strong>Floating badge:</strong> Bottom-left, glassmorphism (blur 12px, rgba(247,251,255,0.92)), radius 0.75rem, verified icon + "IRATA Certified · GCC Operations"</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span class="page-footer-brand">Ocean Arms Technical Services LLC</span>
+    <span class="page-footer-pg">Page 05</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     PAGE 6 — ABOUT & CORE VALUES
+═══════════════════════════════════════ -->
+<div class="content-page page-break">
+  <div class="page-header">
+    <div class="page-header-left"><div class="page-header-dot"></div><span class="page-header-title">05 — About &amp; Core Values (Features)</span></div>
+    <span class="page-header-brand">Ocean Arms Design System</span>
+  </div>
+
+  <div class="section-breakdown no-break">
+    <div class="section-breakdown-header">
+      <span class="section-breakdown-name">About Section</span>
+      <span class="section-breakdown-tag">7rem padding · 2-col grid · bg: --c-bg</span>
+    </div>
+    <div class="section-breakdown-body">
+      <div class="two-col" style="gap:1.5rem;margin-bottom:0;">
+        <div>
+          <p style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--c-primary);margin-bottom:0.5rem;">LEFT COLUMN</p>
+          <ul class="component-list">
+            <li><strong>Overline:</strong> Solar info icon + "About Us", Montserrat 500, 0.65rem, <span class="token">--c-muted</span></li>
+            <li><strong>H2:</strong> "A trusted industrial services partner in the UAE" — Playfair Display 600, clamp(2rem, 3.8vw, 3.2rem), line-height 1.12. "in the UAE" italicised</li>
+            <li><strong>Gradient rule:</strong> 48px × 3px, linear-gradient primary → muted, rounded</li>
+          </ul>
+        </div>
+        <div>
+          <p style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--c-primary);margin-bottom:0.5rem;">RIGHT COLUMN</p>
+          <ul class="component-list">
+            <li><strong>Two paragraphs:</strong> Inter 300, 1rem, line-height 1.8, <span class="token">--c-fg</span></li>
+            <li><strong>Highlighted callout:</strong> left border 3px <span class="token">--c-primary</span>, background <span class="token">--c-s100</span>, border-radius 0 1rem 1rem 0, padding 1.25rem 1.25rem 1.25rem 1.5rem</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-breakdown no-break" style="margin-top:1rem;">
+    <div class="section-breakdown-header">
+      <span class="section-breakdown-name">Core Values — Sticky Card Deck</span>
+      <span class="section-breakdown-tag">Scroll-pinned · 300vh section height · perspective 1200px</span>
+    </div>
+    <div class="section-breakdown-body">
+      <ul class="component-list" style="margin-bottom:1rem;">
+        <li><strong>Scroll mechanic:</strong> Section is 300vh tall. Inner content is position:sticky, height 100vh. On scroll, a requestAnimationFrame loop reads scroll progress (0→1) and interpolates card positions</li>
+        <li><strong>Card spread:</strong> 4 cards in absolute stack (420×360px, perspective 1200px). Spread via txMap [-310, -103, 103, 310]px, rotMap [-13, -4, 4, 13]deg, scaleMap [0.85, 0.93, 0.93, 0.85] → all scale to 1.0 at scroll end</li>
+      </ul>
+      <table class="spec-table">
+        <thead><tr><th>Card</th><th>Tag</th><th>Background</th><th>Text Colour</th><th>Accent</th></tr></thead>
+        <tbody>
+          <tr><td>Safety First</td><td>Safety · Pillar 01</td><td>#0C2340</td><td>#F7FBFF</td><td>#80B8D8</td></tr>
+          <tr><td>Excellence</td><td>Excellence · Pillar 02</td><td>#3580B1</td><td>#F7FBFF</td><td>#C6DFF0</td></tr>
+          <tr><td>Integrity</td><td>Integrity · Pillar 03</td><td>#EBF4FA</td><td>#0C2340</td><td>#3580B1</td></tr>
+          <tr><td>Efficiency</td><td>Efficiency · Pillar 04</td><td>#162D45</td><td>#F7FBFF</td><td>#80B8D8</td></tr>
+        </tbody>
+      </table>
+      <ul class="component-list">
+        <li><strong>Card anatomy:</strong> Rounded 2rem, padding 3rem, box-shadow 0 24px 64px rgba(12,35,64,0.14). Icon circle (52px, accent-colour 13% opacity), H3 Playfair 500 1.55rem, body Inter 300 0.95rem, footer label + hairline divider (accent 20% opacity)</li>
+        <li><strong>Icon badge:</strong> Circular, width 52px, background accent at 13% opacity, icon at accent colour (24px)</li>
+        <li><strong>Tag pill:</strong> Border 1px accent at 27%, rounded full, Montserrat 500 0.6rem 0.2em tracking</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span class="page-footer-brand">Ocean Arms Technical Services LLC</span>
+    <span class="page-footer-pg">Page 06</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     PAGE 7 — VISION & MISSION FLIP CARDS
+═══════════════════════════════════════ -->
+<div class="content-page page-break">
+  <div class="page-header">
+    <div class="page-header-left"><div class="page-header-dot"></div><span class="page-header-title">07 — Vision &amp; Mission Flip Cards</span></div>
+    <span class="page-header-brand">Ocean Arms Design System</span>
+  </div>
+
+  <div class="section-label">Section Header</div>
+  <p class="section-desc" style="margin-bottom:1rem;">Overline: "Who We Are" · H2: "Our <em>Vision &amp; Mission</em>" · Section padding 7rem, background <span class="token">--c-bg</span>. Cards displayed in flex row, gap 2rem, justify-content center.</p>
+
+  <div class="two-col" style="gap:1.5rem;">
+    <div class="section-breakdown no-break">
+      <div class="section-breakdown-header">
+        <span class="section-breakdown-name">Vision Card</span>
+        <span class="section-breakdown-tag">340 × 520px · Flip on hover</span>
+      </div>
+      <div class="section-breakdown-body">
+        <p style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--c-primary);margin-bottom:0.5rem;">FRONT FACE</p>
+        <ul class="component-list" style="margin-bottom:0.85rem;">
+          <li><strong>Background image:</strong> <code style="font-family:monospace;font-size:0.68rem;">/assets/light-blue-background-plain_C0PD.webp</code> — full opacity, no overlay, cover fit</li>
+          <li><strong>Card BG:</strong> rgba(255,255,255,0.82) + backdrop-filter blur(20px)</li>
+          <li><strong>Icon circle:</strong> 72px, bg <span class="token">--c-s100</span>, border rgba(53,128,177,0.25), icon <span class="token">--c-deep</span></li>
+          <li><strong>Pill title:</strong> "Our Vision" — Playfair 600 1.4rem, <span class="token">--c-deep</span>. Pill: rgba(255,255,255,0.6), border <span class="token">--c-s200</span></li>
+          <li><strong>Hint text:</strong> "Hover to learn more" — Montserrat 500, 0.62rem, <span class="token">--c-deep</span>, uppercase, 0.14em tracking</li>
+        </ul>
+        <p style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--c-primary);margin-bottom:0.5rem;">BACK FACE</p>
+        <ul class="component-list">
+          <li><strong>Background:</strong> #0C2340 + backdrop-filter blur(24px)</li>
+          <li><strong>Label:</strong> "VISION" — Montserrat 500, 0.6rem, #80B8D8, 0.3em tracking</li>
+          <li><strong>Divider:</strong> 48px × 1px, rgba(128,184,216,0.35)</li>
+          <li><strong>H3:</strong> Playfair 500, clamp(1rem, 1.6vw, 1.35rem), #F7FBFF, line-height 1.4</li>
+          <li><strong>Body:</strong> Inter 300, 0.92rem, rgba(198,223,240,0.82), line-height 1.85</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-breakdown no-break">
+      <div class="section-breakdown-header">
+        <span class="section-breakdown-name">Mission Card</span>
+        <span class="section-breakdown-tag">340 × 520px · Flip on hover</span>
+      </div>
+      <div class="section-breakdown-body">
+        <p style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--c-primary);margin-bottom:0.5rem;">FRONT FACE</p>
+        <ul class="component-list" style="margin-bottom:0.85rem;">
+          <li><strong>Background image:</strong> <code style="font-family:monospace;font-size:0.68rem;">/assets/bef5af7e6bc17017a5694d1955cb4ae8.jpg</code> — grayscale(100%), opacity 0.55</li>
+          <li><strong>Dark overlay:</strong> rgba(22,45,69,0.6) absolute inset — creates dark blue tint over greyscale image</li>
+          <li><strong>Icon circle:</strong> 72px, bg rgba(255,255,255,0.18), border rgba(255,255,255,0.45), icon #ffffff</li>
+          <li><strong>Pill title:</strong> "Our Mission" — Playfair 600 1.4rem, #ffffff. Pill: rgba(255,255,255,0.15), border rgba(255,255,255,0.3)</li>
+          <li><strong>Hint text:</strong> rgba(255,255,255,0.7), uppercase</li>
+        </ul>
+        <p style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--c-primary);margin-bottom:0.5rem;">BACK FACE</p>
+        <ul class="component-list">
+          <li><strong>Background:</strong> #162D45 + backdrop-filter blur(24px)</li>
+          <li><strong>Label:</strong> "MISSION" — Montserrat 500, 0.6rem, #80B8D8</li>
+          <li><strong>H3:</strong> Playfair 500, #F7FBFF — "What drives every decision we make"</li>
+          <li><strong>Body:</strong> Inter 300, rgba(198,223,240,0.82) — mission statement paragraph</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="annotation" style="margin-top:0.75rem;">
+    <div class="annotation-icon">i</div>
+    <p class="annotation-text"><strong>Flip mechanic:</strong> CSS perspective 1200px on wrapper. <code style="font-family:monospace;font-size:0.7rem;">.vm-card</code> uses <code style="font-family:monospace;font-size:0.7rem;">transform-style: preserve-3d</code>, transition <code style="font-family:monospace;font-size:0.7rem;">0.75s cubic-bezier(0.23,1,0.32,1)</code>. Front and back faces use <code style="font-family:monospace;font-size:0.7rem;">backface-visibility: hidden</code>. Hover triggers <code style="font-family:monospace;font-size:0.7rem;">rotateY(180deg)</code> on <code style="font-family:monospace;font-size:0.7rem;">(hover: hover) and (pointer: fine)</code> media query only.</p>
+  </div>
+
+  <div class="page-footer">
+    <span class="page-footer-brand">Ocean Arms Technical Services LLC</span>
+    <span class="page-footer-pg">Page 07</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     PAGE 8 — ROPE ACCESS / INDUSTRIES
+═══════════════════════════════════════ -->
+<div class="content-page page-break">
+  <div class="page-header">
+    <div class="page-header-left"><div class="page-header-dot"></div><span class="page-header-title">06 &amp; 08 — Rope Access Services &amp; Industries</span></div>
+    <span class="page-header-brand">Ocean Arms Design System</span>
+  </div>
+
+  <div class="section-breakdown no-break">
+    <div class="section-breakdown-header">
+      <span class="section-breakdown-name">Rope Access Services</span>
+      <span class="section-breakdown-tag">Scroll-scrubbed · 350vh · Sticky 100vh</span>
+    </div>
+    <div class="section-breakdown-body">
+      <div class="two-col" style="gap:1.5rem;margin-bottom:0;">
+        <div>
+          <p style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--c-primary);margin-bottom:0.5rem;">LEFT — Service Capabilities Card</p>
+          <ul class="component-list">
+            <li><strong>Card:</strong> white, radius 1.5rem, padding 1.5rem, border <span class="token">--c-s200</span>, shadow 0 16px 60px rgba(12,35,64,0.1)</li>
+            <li><strong>8 service rows</strong> slide in from left (translateX -28px → 0) staggered at 0.06s intervals, triggered by scroll progress thresholds (0→0.55)</li>
+            <li><strong>Row anatomy:</strong> 32px icon circle (<span class="token">--c-s100</span> BG, <span class="token">--c-primary</span> icon), service name Inter 500 0.8rem, description Inter 300 0.72rem <span class="token">--c-muted</span></li>
+            <li>Services: Inspection &amp; NDT, Blasting &amp; Painting, Surface Preparation, Welding Repairs, Hydro Blasting, Insulation Works, Equipment Installation, Building Maintenance</li>
+          </ul>
+        </div>
+        <div>
+          <p style="font-family:'Montserrat',sans-serif;font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--c-primary);margin-bottom:0.5rem;">RIGHT — Workflow + Certifications</p>
+          <ul class="component-list">
+            <li><strong>Project Workflow card:</strong> white, radius 1.5rem. 5-stage vertical timeline — dot (12px circle, <span class="token">--c-s300</span>), connector line (2px <span class="token">--c-s200</span>) filled with <span class="token">--c-deep</span> on scroll via scaleY animation</li>
+            <li><strong>Stages:</strong> Site Survey → Mobilisation → Execution → QA/Inspection → Demobilisation</li>
+            <li><strong>Certifications card:</strong> background <span class="token">--c-deep</span>, radius 1.5rem. 2-column icon grid. Each cell: rgba(255,255,255,0.06) BG, 14px icon <span class="token">--c-muted</span>, label Montserrat 500 0.62rem</li>
+            <li>Certs: IRATA, HSSE, ADNOC Approved, ISO, Drydocks, GCC Operations</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-breakdown no-break" style="margin-top:1rem;">
+    <div class="section-breakdown-header">
+      <span class="section-breakdown-name">Industries Section</span>
+      <span class="section-breakdown-tag">7rem padding · 2-column grid · bg: --c-s100</span>
+    </div>
+    <div class="section-breakdown-body">
+      <ul class="component-list">
+        <li><strong>Industry cards (4):</strong> White, radius 1.75rem, border <span class="token">--c-s200</span>, shadow 0 12px 40px rgba(12,35,64,0.09). Hover: shadow deepens + translateY(-4px)</li>
+        <li><strong>Image area:</strong> 210px height, object-fit cover. Dark gradient overlay top-to-bottom rgba(12,35,64,0.5). Image scales to 1.05 on hover</li>
+        <li><strong>Content area:</strong> padding 1.75rem. H3 Playfair 600 1.35rem <span class="token">--c-deep</span>, body Inter 300 0.88rem line-height 1.7, CTA link "View services →" Montserrat 600 0.62rem <span class="token">--c-primary</span></li>
+        <li><strong>Industries:</strong> Oil &amp; Gas, Marine &amp; Shipping, Power &amp; Energy, Civil &amp; Construction. Each links to a dedicated industry page</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span class="page-footer-brand">Ocean Arms Technical Services LLC</span>
+    <span class="page-footer-pg">Page 08</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     PAGE 9 — WHY CHOOSE US, CTA & FOOTER
+═══════════════════════════════════════ -->
+<div class="content-page page-break">
+  <div class="page-header">
+    <div class="page-header-left"><div class="page-header-dot"></div><span class="page-header-title">09 &amp; 10 — Why Choose Us, CTA Banner &amp; Footer</span></div>
+    <span class="page-header-brand">Ocean Arms Design System</span>
+  </div>
+
+  <div class="section-breakdown no-break">
+    <div class="section-breakdown-header">
+      <span class="section-breakdown-name">Why Choose Us</span>
+      <span class="section-breakdown-tag">7rem padding · bg: --c-bg</span>
+    </div>
+    <div class="section-breakdown-body">
+      <ul class="component-list">
+        <li><strong>Points grid:</strong> 9 points in 3-column grid, 0 gap, border 1px <span class="token">--c-s200</span>, radius 1.5rem, overflow hidden. Each cell: white BG, Solar check-circle icon <span class="token">--c-primary</span>, Inter 400 0.85rem <span class="token">--c-fg</span>, padding 1.25rem 1.5rem</li>
+        <li>Points: IRATA certified · Full HSSE compliance · 24/7 emergency · Single-source team · Latest tooling · GCC track record · Competitive pricing · Rapid mobilisation · Experienced PM</li>
+        <li><strong>Sub-cards (2):</strong> background <span class="token">--c-s100</span>, radius 1.5rem, padding 2rem, border <span class="token">--c-s200</span>. "Quality Assurance" card (paragraph) + "Client Sectors" card (pill tags grid)</li>
+        <li><strong>Sector tags:</strong> ADNOC Group, Dubai Petroleum, Drydocks World, DP World, DEWA, Gulf Navigation, Major EPC Contractors, Offshore Operators. Montserrat 500 0.6rem, white BG, border <span class="token">--c-s200</span>, rounded full</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-breakdown no-break" style="margin-top:1rem;">
+    <div class="section-breakdown-header">
+      <span class="section-breakdown-name">CTA Banner</span>
+      <span class="section-breakdown-tag">bg: --c-deep · 5rem padding · Flex row</span>
+    </div>
+    <div class="section-breakdown-body">
+      <ul class="component-list">
+        <li><strong>Background:</strong> <span class="token">--c-deep</span> with centred radial glow (800×400px, rgba(53,128,177,0.18) → transparent)</li>
+        <li><strong>H2:</strong> Playfair 500, clamp(1.8rem, 3.5vw, 2.8rem), #F5F5F4, max-width 560px, line-height 1.2. "reliable together" italicised</li>
+        <li><strong>Subline:</strong> Inter 300, 1rem, rgba(245,245,244,0.65)</li>
+        <li><strong>Buttons:</strong> Primary ("Request a Quotation", blue CTA, box-shadow 0 8px 32px rgba(53,128,177,0.35)) + Ghost ("Call Us 24/7", transparent with white border rgba(255,255,255,0.2))</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-breakdown no-break" style="margin-top:1rem;">
+    <div class="section-breakdown-header">
+      <span class="section-breakdown-name">Footer</span>
+      <span class="section-breakdown-tag">bg: --c-deep · 5rem top / 3rem bottom</span>
+    </div>
+    <div class="section-breakdown-body">
+      <div class="two-col" style="gap:1.5rem;margin-bottom:0;">
+        <div>
+          <ul class="component-list">
+            <li><strong>Grid:</strong> 4 columns (1.5fr 1fr 1fr 1fr), 3rem gap. Divided by bottom border 1px rgba(255,255,255,0.08)</li>
+            <li><strong>Brand column:</strong> Logo (same Montserrat+Playfair), tagline Inter 300 0.88rem rgba(250,250,250,0.6), 4 social icon circles (40px, border rgba(255,255,255,0.12))</li>
+            <li><strong>Link columns:</strong> Services, Industries, Company. Heading Montserrat 600 0.65rem 0.18em tracking <span class="token">--c-muted</span>. Links Inter 300 0.88rem rgba(250,250,250,0.6), hover → #FAFAFA</li>
+          </ul>
+        </div>
+        <div>
+          <ul class="component-list">
+            <li><strong>Bottom bar:</strong> Copyright Inter 300 0.8rem rgba(250,250,250,0.35) left, Legal links right (Privacy Policy, Terms, Cookie Policy)</li>
+            <li><strong>Services listed:</strong> Rope Access, Inspection &amp; NDT, Blasting &amp; Painting, Welding Repairs</li>
+            <li><strong>Industries listed:</strong> Oil &amp; Gas, Marine &amp; Shipping, Power &amp; Energy, Civil &amp; Construction</li>
+            <li><strong>Company links:</strong> About Us, Certifications, FAQ, Contact Us</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span class="page-footer-brand">Ocean Arms Technical Services LLC</span>
+    <span class="page-footer-pg">Page 09</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════
+     PAGE 10 — MOTION & ANIMATION
+═══════════════════════════════════════ -->
+<div class="content-page page-break">
+  <div class="page-header">
+    <div class="page-header-left"><div class="page-header-dot"></div><span class="page-header-title">10 — Motion &amp; Animation System</span></div>
+    <span class="page-header-brand">Ocean Arms Design System</span>
+  </div>
+
+  <div class="section-label">Foundation</div>
+  <div class="section-title">Motion <em>Principles</em></div>
+  <div class="section-divider"></div>
+  <p class="section-desc">All animations serve a purpose — revealing content, guiding attention, or confirming interaction. Decorative-only animation is avoided. Reduced-motion preferences are fully respected via <code style="font-family:monospace;font-size:0.75rem;">@media (prefers-reduced-motion: reduce)</code>.</p>
+
+  <div class="anim-grid">
+    <div class="anim-card">
+      <div class="anim-name">cta-bounce</div>
+      <div class="anim-detail">Hero H1 entrance. Y: 40px → 0 with overshoot at 55% (-8px), settle at 75% (4px). Cubic-bezier(0.34,1.56,0.64,1). Duration 0.9s. Delays: 0.05s, 0.22s, 0.40s, 0.58s, 0.72s for stagger.</div>
+    </div>
+    <div class="anim-card">
+      <div class="anim-name">pulse-glow</div>
+      <div class="anim-detail">Hero CTA button. Pseudo-element ::after, border 2px rgba(53,128,177,0.55), scales from 1.02 → 1.65 and fades opacity 0.65 → 0. Duration 2.2s ease-out infinite.</div>
+    </div>
+    <div class="anim-card">
+      <div class="anim-name">scrollMarquee</div>
+      <div class="anim-detail">Horizontal marquee strip. translateX 0 → -50% (doubled track). Duration 28s linear infinite. Pauses on hover (animation-play-state: paused).</div>
+    </div>
+    <div class="anim-card">
+      <div class="anim-name">Scroll Reveal</div>
+      <div class="anim-detail">All .reveal elements: opacity 0, translateY 32px → visible state via IntersectionObserver. Transition 0.8s cubic-bezier(0.25,1,0.5,1). Threshold 0.05, rootMargin 0 0 -30px 0.</div>
+    </div>
+    <div class="anim-card">
+      <div class="anim-name">Flip Card</div>
+      <div class="anim-detail">Vision/Mission cards. perspective 1200px, rotateY 180deg on hover. Transition 0.75s cubic-bezier(0.23,1,0.32,1). backface-visibility hidden. Pointer-hover-only media query.</div>
+    </div>
+    <div class="anim-card">
+      <div class="anim-name">Card Spread</div>
+      <div class="anim-detail">Core Values deck. rAF scroll-scrubbed, lerp(prev, raw, 0.07) for smooth interpolation. txMap / rotMap / scaleMap spread on scroll. IntersectionObserver starts/stops the rAF loop.</div>
+    </div>
+    <div class="anim-card">
+      <div class="anim-name">Service Rows</div>
+      <div class="anim-detail">Rope Access list items. translateX -28px → 0, opacity 0 → 1 at staggered scroll thresholds (0→0.55). Transition 0.5s with 0.06s delay increments per row.</div>
+    </div>
+    <div class="anim-card">
+      <div class="anim-name">Timeline Fill</div>
+      <div class="anim-detail">Project Workflow connector lines. scaleY 0 → 1, transformOrigin top. Activated between paired stage thresholds [0.22, 0.38, 0.55, 0.70, 0.86].</div>
+    </div>
+    <div class="anim-card">
+      <div class="anim-name">Milestone Dots</div>
+      <div class="anim-detail">.ms-dot background transitions 0.45s. Active dot scales to 1.35× and changes BG to --c-deep. .ms-content fades from opacity 0 → 1 over 0.4s.</div>
+    </div>
+  </div>
+
+  <div class="section-label" style="margin-top:0.5rem;">Easing Reference</div>
+  <table class="spec-table">
+    <thead><tr><th>Name</th><th>Value</th><th>Use Case</th></tr></thead>
+    <tbody>
+      <tr><td>Bounce CTA</td><td><code>cubic-bezier(0.34, 1.56, 0.64, 1)</code></td><td>Hero heading entrance — spring overshoot</td></tr>
+      <tr><td>Smooth Reveal</td><td><code>cubic-bezier(0.25, 1, 0.5, 1)</code></td><td>Scroll reveal, core values card spread</td></tr>
+      <tr><td>Flip Card</td><td><code>cubic-bezier(0.23, 1, 0.32, 1)</code></td><td>Vision/Mission 3D card flip</td></tr>
+      <tr><td>FAQ Flip</td><td><code>cubic-bezier(0.77, 0, 0.175, 1)</code></td><td>FAQ accordion card flip</td></tr>
+      <tr><td>Standard</td><td><code>ease / 0.2s</code></td><td>Hover states — colour, border, scale</td></tr>
+      <tr><td>Linear</td><td><code>linear</code></td><td>Marquee scroll animation</td></tr>
+    </tbody>
+  </table>
+
+  <div class="annotation">
+    <div class="annotation-icon">!</div>
+    <p class="annotation-text"><strong>Reduced motion:</strong> All keyframe animations (<code style="font-family:monospace;font-size:0.7rem;">cta-bounce</code>, <code style="font-family:monospace;font-size:0.7rem;">marquee</code>, <code style="font-family:monospace;font-size:0.7rem;">pulse-glow</code>, <code style="font-family:monospace;font-size:0.7rem;">heroFloat</code>) are disabled. Reveal transitions are cut to <code style="font-family:monospace;font-size:0.7rem;">opacity 0.2s ease</code> with no transform. Card flips and milestone animations are set to <code style="font-family:monospace;font-size:0.7rem;">transition: none</code>. Hover scale interactions are gated behind the <code style="font-family:monospace;font-size:0.7rem;">prefersHover</code> JS flag.</p>
+  </div>
+
+  <div class="page-footer">
+    <span class="page-footer-brand">Ocean Arms Technical Services LLC</span>
+    <span class="page-footer-pg">Page 10</span>
+  </div>
+</div>
+
+</body>
+</html>
