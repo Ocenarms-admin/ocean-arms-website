@@ -252,9 +252,8 @@ function Navbar() {
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
       height: 80, display: 'flex', alignItems: 'center',
       background: pastHero ? '#EBF4FA' : 'transparent',
-      transition: 'background 0.5s ease',
-      boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
       transition: 'background 0.4s ease',
+      boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
     }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', width: '100%', padding: '0 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {/* Logo */}

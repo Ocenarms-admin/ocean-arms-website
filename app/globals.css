@@ -3,6 +3,7 @@
 
 @theme {
   /* Color tokens */
+  --color-surface: #F3F2ED;
   --color-navy: oklch(26% .09 256);
   --color-navy-foreground: oklch(97% .01 248);
   --color-sky: oklch(78% .09 233);
@@ -50,6 +51,15 @@
 
 .animate-pulse-glow { animation: pulse-glow 5s ease-in-out infinite; }
 
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 38s linear infinite;
+  will-change: transform;
+}
+
 .glass {
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(12px);
@@ -61,4 +71,20 @@
     linear-gradient(oklch(97% .01 248 / .04) 1px, transparent 1px),
     linear-gradient(90deg, oklch(97% .01 248 / .04) 1px, transparent 1px);
   background-size: 64px 64px;
+}
+
+/* ── Industry pages: new-temp-2 colour palette ─────────────────── */
+.industry-theme {
+  --color-surface:           #F7FBFF;
+  --color-background:        #ffffff;
+  --color-card:              #ffffff;
+  --color-foreground:        #0C2340;
+  --color-muted-foreground:  #3A5270;
+  --color-primary:           #3580B1;
+  --color-primary-foreground:#ffffff;
+  --color-navy:              #0C2340;
+  --color-navy-foreground:   #F7FBFF;
+  --color-sky:               #80B8D8;
+  --color-sky-soft:          #EBF4FA;
+  --color-border:            rgba(53, 128, 177, 0.14);
 }
