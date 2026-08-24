@@ -1,381 +1,364 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
-
-function FadeUp({
-  children,
-  delay = 0,
-  className = "",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 type FormData = {
   name: string;
-  company: string;
   email: string;
   phone: string;
-  industry: string;
-  service: string;
   message: string;
 };
 
-const industryOptions = [
-  "Oil & Gas",
-  "Marine & Shipping",
-  "Power & Energy",
-  "Civil & Construction",
-  "Other",
-];
+type SubmitState = "idle" | "submitting" | "success" | "error";
 
-const serviceOptions = [
-  "Rope Access Services",
-  "Industrial Painting & Protective Coating",
-  "Mechanical Maintenance",
-  "Shutdown & Turnaround Support",
-  "Ship Repair & Vessel Maintenance",
-  "Hull Maintenance",
-  "Tank Cleaning",
-  "NDT Inspection Support",
-  "Facade & High-Rise Maintenance",
-  "Manpower Supply",
-  "Other",
+const contactDetails = [
+  {
+    label: "Phone",
+    primary: "+971 56 744 4837",
+    secondary: null,
+    href: "tel:+971567444837",
+  },
+  {
+    label: "Email",
+    primary: "info@oceanarms.ae",
+    secondary: null,
+    href: "mailto:info@oceanarms.ae",
+  },
+  {
+    label: "Address",
+    primary: "Office No. 21MF, Nusrat Rahmanian Bldg",
+    secondary: "Dubai, UAE",
+    href: "https://maps.google.com/?q=Office+No.+21MF,+Nusrat+Rahmanian+Bldg,+Dubai,+UAE",
+  },
 ];
 
 export default function ContactPage() {
   const [formData, setFormData] = useState<FormData>({
     name: "",
-    company: "",
     email: "",
     phone: "",
-    industry: "",
-    service: "",
     message: "",
   });
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [attachment, setAttachment] = useState<File | null>(null);
+  const [submitState, setSubmitState] = useState<SubmitState>("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    setAttachment(file);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setSubmitting(false);
-    setSubmitted(true);
+    setSubmitState("submitting");
+    setErrorMsg("");
+
+    try {
+      const body = new FormData();
+      body.append("name", formData.name);
+      body.append("email", formData.email);
+      body.append("phone", formData.phone);
+      body.append("message", formData.message);
+      if (attachment) body.append("attachment", attachment);
+
+      const res = await fetch("/api/contact", { method: "POST", body });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error ?? "Something went wrong.");
+      setSubmitState("success");
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Failed to send. Please try again.");
+      setSubmitState("error");
+    }
   };
 
   const inputClass =
-    "w-full border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-muted-foreground";
+    "w-full rounded-lg border border-border bg-surface/50 px-4 py-3 text-sm text-foreground outline-none transition-all duration-200 focus:border-foreground/30 focus:bg-white placeholder:text-muted-foreground/50";
+
+  const labelClass =
+    "block text-[0.7rem] font-semibold uppercase tracking-widest text-muted-foreground mb-2";
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative isolate overflow-hidden bg-navy pt-[65px]">
-        <div className="absolute inset-0 hero-grid" />
-        <div className="relative mx-auto max-w-6xl px-5 py-24 sm:py-32 text-center">
-          <motion.p
-            className="section-eyebrow text-sky"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            Get in Touch
-          </motion.p>
-          <motion.h1
-            className="mt-5 font-display text-4xl font-bold uppercase leading-[1.05] text-navy-foreground sm:text-6xl"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          >
-            Contact Our Team
-          </motion.h1>
-          <motion.p
-            className="mt-5 max-w-lg mx-auto text-base text-navy-foreground/75"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.35 }}
-          >
-            Tell us about your project — our experts will respond within 24 hours.
-          </motion.p>
-        </div>
-      </section>
+      {/* ── Split layout ── */}
+      <div className="flex flex-col lg:flex-row">
 
-      {/* Main Content */}
-      <section className="bg-sky-soft py-20 sm:py-28">
-        <div className="mx-auto max-w-6xl px-5">
-          <div className="grid lg:grid-cols-[1fr_1.6fr] gap-10">
-            {/* Info sidebar */}
-            <div className="space-y-6">
-              <FadeUp>
-                <h2 className="font-display text-2xl font-bold uppercase text-navy">
-                  Let&apos;s Talk
-                </h2>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  Available 24/7 for emergency support and project inquiries. Reach us through
-                  any of the channels below.
-                </p>
-              </FadeUp>
+        {/* Left image panel — sticky on desktop */}
+        <div className="relative w-full h-[56vw] max-h-[420px] lg:max-h-none lg:h-[calc(100vh-65px)] lg:sticky lg:top-[65px] lg:w-[44%] shrink-0 overflow-hidden">
+          <Image
+            src="/assets/marine.jpg"
+            alt="Ocean Arms marine and industrial operations"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-navy/60" />
+          <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/20 to-transparent" />
 
-              {[
-                {
-                  label: "Office",
-                  lines: ["Office No. 21MF, Nusrat Rahmanian Building", "Dubai, United Arab Emirates"],
-                },
-                {
-                  label: "Phone",
-                  lines: ["+971 56 744 4837", "24/7 Emergency Response"],
-                },
-                {
-                  label: "Email",
-                  lines: ["info@oceanarms.ae"],
-                },
-              ].map((item, i) => (
-                <FadeUp key={item.label} delay={0.1 + i * 0.08}>
-                  <div className="bg-card p-6 shadow-panel">
-                    <p className="section-eyebrow text-primary mb-3">{item.label}</p>
-                    {item.lines.map((line, j) => (
-                      <p key={j} className={`text-sm ${j === 0 ? "text-foreground font-medium" : "text-muted-foreground mt-0.5"}`}>
-                        {line}
-                      </p>
-                    ))}
-                  </div>
-                </FadeUp>
-              ))}
+          {/* Bottom content */}
+          <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12 xl:p-16">
+            <motion.h2
+              className="font-display font-bold text-navy-foreground leading-none mb-4"
+              style={{ fontSize: "clamp(2.2rem, 4.5vw, 3.8rem)" }}
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            >
+              Always ready<br />
+              for your next<br />
+              project.
+            </motion.h2>
+            <motion.p
+              className="text-sm text-navy-foreground/55 max-w-xs leading-relaxed mb-8"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.18 }}
+            >
+              24/7 emergency response and project enquiries across the UAE and beyond.
+            </motion.p>
 
-              <FadeUp delay={0.35}>
-                <div className="bg-navy p-6 text-navy-foreground shadow-panel">
-                  <p className="section-eyebrow text-sky mb-4">Coverage</p>
-                  <div className="flex flex-wrap gap-2">
-                    {["Dubai, UAE (HQ)", "Mumbai, India", "Cochin, India"].map((city) => (
-                      <span
-                        key={city}
-                        className="border border-navy-foreground/20 px-3 py-1.5 text-xs text-navy-foreground/75"
-                      >
-                        {city}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </FadeUp>
-            </div>
+            {/* Contact details — icon row */}
+            <motion.div
+              className="border-t border-navy-foreground/15 pt-6 flex items-start gap-6"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.3 }}
+            >
+              {/* Phone */}
+              <a href="tel:+971567444837" className="group flex flex-col items-center gap-1.5 min-w-0">
+                <svg className="h-4 w-4 text-navy-foreground/50 group-hover:text-sky transition-colors" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 6.75z" />
+                </svg>
+                <p className="text-xs font-medium text-navy-foreground group-hover:text-sky transition-colors leading-snug">+971 56 744 4837</p>
+              </a>
 
-            {/* Form */}
-            <FadeUp delay={0.1}>
-              <div className="bg-card p-8 shadow-panel sm:p-10">
-                <AnimatePresence mode="wait">
-                  {submitted ? (
-                    <motion.div
-                      key="success"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.5 }}
-                      className="flex flex-col items-center justify-center py-16 text-center"
-                    >
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.1, type: "spring", stiffness: 200, damping: 15 }}
-                        className="grid h-16 w-16 place-items-center bg-primary mb-6"
-                      >
-                        <svg className="h-8 w-8 text-primary-foreground" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </motion.div>
-                      <h3 className="font-display text-2xl font-bold uppercase text-navy mb-3">
-                        Message Sent!
-                      </h3>
-                      <p className="text-sm text-muted-foreground mb-8 max-w-xs">
-                        Thank you for reaching out. Our team will get back to you within 24 hours.
-                      </p>
-                      <button
-                        onClick={() => {
-                          setSubmitted(false);
-                          setFormData({ name: "", company: "", email: "", phone: "", industry: "", service: "", message: "" });
-                        }}
-                        className="bg-primary px-7 py-3 text-sm font-semibold uppercase tracking-wide text-primary-foreground hover:opacity-90 transition-opacity"
-                      >
-                        Send Another Message
-                      </button>
-                    </motion.div>
-                  ) : (
-                    <motion.form
-                      key="form"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      onSubmit={handleSubmit}
-                      className="space-y-5"
-                    >
-                      <div>
-                        <h3 className="font-display text-xl font-bold uppercase text-navy">
-                          Send Us a Message
-                        </h3>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          Fill in the details below and we&apos;ll be in touch shortly.
-                        </p>
-                      </div>
+              <div className="w-px self-stretch bg-navy-foreground/10 shrink-0" />
 
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                          <label className="section-eyebrow text-muted-foreground mb-2 block">
-                            Full Name <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            name="name"
-                            required
-                            value={formData.name}
-                            onChange={handleChange}
-                            placeholder="John Smith"
-                            className={inputClass}
-                          />
-                        </div>
-                        <div>
-                          <label className="section-eyebrow text-muted-foreground mb-2 block">
-                            Company Name
-                          </label>
-                          <input
-                            type="text"
-                            name="company"
-                            value={formData.company}
-                            onChange={handleChange}
-                            placeholder="Your Company LLC"
-                            className={inputClass}
-                          />
-                        </div>
-                      </div>
+              {/* Email */}
+              <a href="mailto:info@oceanarms.ae" className="group flex flex-col items-center gap-1.5 min-w-0">
+                <svg className="h-4 w-4 text-navy-foreground/50 group-hover:text-sky transition-colors" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                </svg>
+                <p className="text-xs font-medium text-navy-foreground group-hover:text-sky transition-colors leading-snug break-all">info@oceanarms.ae</p>
+              </a>
 
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                          <label className="section-eyebrow text-muted-foreground mb-2 block">
-                            Email Address <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="email"
-                            name="email"
-                            required
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="john@company.com"
-                            className={inputClass}
-                          />
-                        </div>
-                        <div>
-                          <label className="section-eyebrow text-muted-foreground mb-2 block">
-                            Phone Number
-                          </label>
-                          <input
-                            type="tel"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            placeholder="+971 XX XXX XXXX"
-                            className={inputClass}
-                          />
-                        </div>
-                      </div>
+              <div className="w-px self-stretch bg-navy-foreground/10 shrink-0" />
 
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                          <label className="section-eyebrow text-muted-foreground mb-2 block">
-                            Industry
-                          </label>
-                          <select
-                            name="industry"
-                            value={formData.industry}
-                            onChange={handleChange}
-                            className={inputClass}
-                          >
-                            <option value="">Select Industry</option>
-                            {industryOptions.map((ind) => (
-                              <option key={ind} value={ind}>{ind}</option>
-                            ))}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="section-eyebrow text-muted-foreground mb-2 block">
-                            Service Required
-                          </label>
-                          <select
-                            name="service"
-                            value={formData.service}
-                            onChange={handleChange}
-                            className={inputClass}
-                          >
-                            <option value="">Select Service</option>
-                            {serviceOptions.map((s) => (
-                              <option key={s} value={s}>{s}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="section-eyebrow text-muted-foreground mb-2 block">
-                          Project Details <span className="text-red-500">*</span>
-                        </label>
-                        <textarea
-                          name="message"
-                          required
-                          value={formData.message}
-                          onChange={handleChange}
-                          placeholder="Please describe your project requirements, location, timeline, and any specific technical details..."
-                          rows={5}
-                          className={`${inputClass} resize-none`}
-                        />
-                      </div>
-
-                      <motion.button
-                        type="submit"
-                        disabled={submitting}
-                        whileHover={{ opacity: 0.9 }}
-                        whileTap={{ scale: 0.99 }}
-                        className="w-full bg-primary py-4 text-sm font-semibold uppercase tracking-wide text-primary-foreground disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-3 transition-opacity"
-                      >
-                        {submitting ? (
-                          <>
-                            <motion.span
-                              animate={{ rotate: 360 }}
-                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                              className="inline-block w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full"
-                            />
-                            Sending...
-                          </>
-                        ) : (
-                          "Send Enquiry →"
-                        )}
-                      </motion.button>
-
-                      <p className="text-center text-xs text-muted-foreground">
-                        We&apos;ll respond within 24 hours.
-                      </p>
-                    </motion.form>
-                  )}
-                </AnimatePresence>
-              </div>
-            </FadeUp>
+              {/* Address */}
+              <a href="https://maps.google.com/?q=Office+No.+21MF,+Nusrat+Rahmanian+Bldg,+Dubai,+UAE" target="_blank" rel="noopener noreferrer" className="group flex flex-col items-center gap-1.5 min-w-0">
+                <svg className="h-4 w-4 text-navy-foreground/50 group-hover:text-sky transition-colors" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                </svg>
+                <p className="text-xs font-medium text-navy-foreground group-hover:text-sky transition-colors leading-snug text-center">Office No. 21MF, Nusrat Rahmanian Bldg</p>
+                <p className="text-[0.65rem] text-navy-foreground/40">Dubai, UAE</p>
+              </a>
+            </motion.div>
           </div>
         </div>
-      </section>
+
+        {/* Right scrollable panel */}
+        <div className="w-full lg:w-[56%] flex flex-col bg-background lg:rounded-tl-3xl shadow-[-12px_0_40px_rgba(0,0,0,0.06)]">
+          <main className="flex-1 px-6 py-12 sm:px-10 lg:px-14 xl:px-20">
+
+            {/* Heading */}
+            <motion.div
+              className="mb-10"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55 }}
+            >
+              <p className="section-eyebrow text-muted-foreground mb-3">Contact us</p>
+              <h1 className="font-display text-4xl sm:text-5xl font-bold text-foreground tracking-tight leading-none mb-3">
+                Get in touch
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Fill out the form and we&apos;ll respond within 24 hours.
+              </p>
+            </motion.div>
+
+            {/* Form */}
+            <AnimatePresence mode="wait">
+              {submitState === "success" ? (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="py-16 text-center max-w-sm mx-auto"
+                >
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 220, damping: 16 }}
+                    className="grid h-14 w-14 place-items-center bg-foreground rounded-full mx-auto mb-6"
+                  >
+                    <svg className="h-7 w-7 text-background" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </motion.div>
+                  <h2 className="font-display text-2xl font-bold text-foreground uppercase mb-3">Message sent</h2>
+                  <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
+                    Thank you for reaching out. Our team will respond within 24 hours.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSubmitState("idle");
+                      setFormData({ name: "", email: "", phone: "", message: "" });
+                      setAttachment(null);
+                    }}
+                    className="bg-foreground px-7 py-3 text-xs font-semibold uppercase tracking-widest text-background hover:opacity-80 transition-opacity rounded-lg"
+                  >
+                    Send another
+                  </button>
+                </motion.div>
+              ) : (
+                <motion.form
+                  key="form"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  onSubmit={handleSubmit}
+                  className="space-y-5"
+                >
+                  {/* Name + Email */}
+                  <div className="grid sm:grid-cols-2 gap-5">
+                    <div>
+                      <label className={labelClass}>Name *</label>
+                      <input
+                        type="text"
+                        name="name"
+                        required
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder="Your full name"
+                        className={inputClass}
+                      />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Email *</label>
+                      <input
+                        type="email"
+                        name="email"
+                        required
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder="you@company.com"
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Contact no. */}
+                  <div>
+                    <label className={labelClass}>Contact no.</label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="+971 XX XXX XXXX"
+                      className={inputClass}
+                    />
+                  </div>
+
+                  {/* Message */}
+                  <div>
+                    <label className={labelClass}>Message *</label>
+                    <textarea
+                      name="message"
+                      required
+                      value={formData.message}
+                      onChange={handleChange}
+                      placeholder="Tell us about your project or enquiry"
+                      rows={5}
+                      className={`${inputClass} resize-none`}
+                    />
+                  </div>
+
+                  {/* Attachment */}
+                  <div>
+                    <label className={labelClass}>Attachment</label>
+                    <div
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full rounded-lg border border-dashed border-border bg-surface/30 px-4 py-4 flex items-center gap-3 cursor-pointer hover:border-foreground/30 hover:bg-surface/60 transition-all duration-200 group"
+                    >
+                      <svg className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors shrink-0" fill="none" stroke="currentColor" strokeWidth={1.6} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+                      </svg>
+                      <div className="min-w-0 flex-1">
+                        {attachment ? (
+                          <p className="text-sm text-foreground font-medium truncate">{attachment.name}</p>
+                        ) : (
+                          <p className="text-sm text-muted-foreground/60">
+                            Click to attach a file
+                            <span className="ml-1.5 text-[0.65rem] text-muted-foreground/40">PDF, DOC, JPG up to 10MB</span>
+                          </p>
+                        )}
+                      </div>
+                      {attachment && (
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); setAttachment(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+                          className="shrink-0 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </div>
+
+                  {/* Error message */}
+                  {submitState === "error" && (
+                    <p className="text-xs text-red-500 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                      {errorMsg}
+                    </p>
+                  )}
+
+                  {/* Submit */}
+                  <motion.button
+                    type="submit"
+                    disabled={submitState === "submitting"}
+                    whileHover={{ opacity: 0.88 }}
+                    whileTap={{ scale: 0.985 }}
+                    className="w-full bg-foreground py-3.5 text-xs font-semibold uppercase tracking-widest text-background disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 transition-opacity rounded-lg mt-2"
+                  >
+                    {submitState === "submitting" ? (
+                      <>
+                        <motion.span
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          className="inline-block h-3.5 w-3.5 rounded-full border-2 border-background/30 border-t-background"
+                        />
+                        Sending...
+                      </>
+                    ) : (
+                      "Send message"
+                    )}
+                  </motion.button>
+                </motion.form>
+              )}
+            </AnimatePresence>
+
+          </main>
+        </div>
+      </div>
     </>
   );
 }

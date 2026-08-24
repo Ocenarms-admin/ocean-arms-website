@@ -47,7 +47,7 @@ function Icon({ type, className }: { type: string; className?: string }) {
 
 const stats = [
   { value: "14",               label: "Service lines" },
-  { value: "High-rise→Ground", label: "Coverage" },
+  { value: "High-rise → Ground", label: "Coverage" },
   { value: "100%",             label: "Certified crews" },
   { value: "0",                label: "Safety compromise" },
 ];
@@ -141,7 +141,7 @@ export default function CivilConstructionPage() {
       </section>
 
       {/* ════ MARQUEE ════ */}
-      <section className="overflow-hidden bg-navy py-5">
+      <section className="overflow-hidden bg-navy py-5 my-10">
         <div className="animate-marquee flex whitespace-nowrap">
           {marqueeItems.map((name, i) => (
             <span key={i} className="inline-flex shrink-0 items-center">
@@ -157,8 +157,8 @@ export default function CivilConstructionPage() {
         <div className="mx-auto max-w-6xl px-6 lg:px-8">
           <dl className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
             {stats.map((s) => (
-              <FadeUp key={s.label}>
-                <dd className="font-display font-bold text-foreground" style={{ fontSize: "clamp(2rem,5vw,4.5rem)", lineHeight: 1 }}>{s.value}</dd>
+              <FadeUp key={s.label} className="min-w-0">
+                <dd className="font-display font-bold text-foreground" style={{ fontSize: "clamp(2rem,4vw,3.5rem)", lineHeight: 1, overflowWrap: "break-word" }}>{s.value}</dd>
                 <dt className="mt-2 text-[0.62rem] uppercase tracking-widest text-muted-foreground">{s.label}</dt>
               </FadeUp>
             ))}

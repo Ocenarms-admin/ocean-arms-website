@@ -301,25 +301,46 @@ function Navbar() {
 /* ═══════════════════════════════════════
    2. HERO
 ═══════════════════════════════════════ */
+const heroSlides = [
+  { src: '/assets/new-hr-3.png',  industry: 'Marine & Shipping' },
+  { src: '/assets/oil-gas.jpg',   industry: 'Oil & Gas' },
+  { src: '/assets/power.jpg',     industry: 'Power & Energy' },
+  { src: '/assets/civil.jpg',     industry: 'Civil & Construction' },
+];
+
 function Hero() {
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setActive((prev) => (prev + 1) % heroSlides.length);
+    }, 3000);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <section style={{
       minHeight: '100vh', display: 'flex', alignItems: 'center',
       paddingTop: 80, position: 'relative', overflow: 'hidden',
     }}>
-      {/* ── Full-bleed background image ── */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/assets/new-hr-3.png"
-        alt=""
-        aria-hidden="true"
-        style={{
-          position: 'absolute', inset: 0,
-          width: '100%', height: '100%',
-          objectFit: 'cover', objectPosition: 'center',
-          zIndex: 0,
-        }}
-      />
+      {/* ── Crossfading background images ── */}
+      {heroSlides.map((slide, i) => (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          key={slide.src}
+          src={slide.src}
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: 'absolute', inset: 0,
+            width: '100%', height: '100%',
+            objectFit: 'cover', objectPosition: 'center',
+            zIndex: 0,
+            opacity: i === active ? 1 : 0,
+            transition: 'opacity 1.2s ease-in-out',
+          }}
+        />
+      ))}
 
       {/* ── Dark overlay for text contrast ── */}
       <div style={{
@@ -327,19 +348,41 @@ function Hero() {
         background: 'rgba(12,35,64,0.52)',
       }} />
 
+      {/* ── Slide indicator dots ── */}
+      <div style={{
+        position: 'absolute', bottom: '2rem', left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex', gap: '0.5rem', zIndex: 4,
+      }}>
+        {heroSlides.map((slide, i) => (
+          <button
+            key={slide.industry}
+            aria-label={`Show ${slide.industry}`}
+            onClick={() => setActive(i)}
+            style={{
+              width: i === active ? 28 : 8,
+              height: 8, borderRadius: 9999, border: 'none',
+              background: i === active ? '#80B8D8' : 'rgba(255,255,255,0.35)',
+              cursor: 'pointer', padding: 0,
+              transition: 'width 0.4s ease, background 0.4s ease',
+            }}
+          />
+        ))}
+      </div>
+
 
 
       {/* ── Content ── */}
       <div style={{
         maxWidth: 1280, margin: '0 auto', width: '100%',
-        padding: '4rem 1.5rem', position: 'relative', zIndex: 3,
+        padding: '1.5rem 1.5rem', position: 'relative', zIndex: 3,
       }}>
         <div style={{ maxWidth: 660 }}>
           {/* Eyebrow */}
           <p style={{
             fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.65rem',
             letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(198,223,240,0.9)',
-            marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: 8,
+            marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: 8,
           }}>
             <iconify-icon icon="solar:verified-check-linear" width="13" />
             Dubai, United Arab Emirates
@@ -365,14 +408,14 @@ function Hero() {
           {/* Description */}
           <p className="cta-bounce" style={{
             fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '1.05rem', lineHeight: 1.75,
-            color: 'rgba(247,251,255,0.72)', maxWidth: 480, marginTop: '1.75rem', animationDelay: '0.58s',
+            color: 'rgba(247,251,255,0.72)', maxWidth: 480, marginTop: '1rem', animationDelay: '0.58s',
           }}>
             Ocean Arms Technical Services LLC delivers integrated technical solutions across
             Oil & Gas, Marine, Power, and Civil sectors throughout the GCC region.
           </p>
 
           {/* CTAs */}
-          <div className="cta-bounce" style={{ display: 'flex', gap: '1rem', marginTop: '2.5rem', flexWrap: 'wrap', animationDelay: '0.72s' }}>
+          <div className="cta-bounce" style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap', animationDelay: '0.72s' }}>
             <button className="pulse-glow" style={{
               fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem',
               letterSpacing: '0.1em', textTransform: 'uppercase',
@@ -403,9 +446,9 @@ function Hero() {
           </div>
 
           {/* Stats row */}
-          <div style={{ display: 'flex', gap: '2.5rem', marginTop: '3.5rem', paddingTop: '2.5rem', borderTop: '1px solid rgba(255,255,255,0.15)' }}>
+          <div style={{ display: 'flex', gap: '2.5rem', marginTop: '1.75rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.15)' }}>
             {[['24/7', 'Emergency Response'], ['4', 'Core Industries'], ['GCC', 'Coverage']].map(([num, label]) => (
-              <div key={label}>
+              <div key={label} style={{ textAlign: 'center' }}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.7rem', fontWeight: 600, color: '#F7FBFF' }}>{num}</div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(198,223,240,0.8)', marginTop: 3 }}>{label}</div>
               </div>
@@ -1135,7 +1178,7 @@ function WhyChoose() {
               padding: '1.25rem 1.5rem',
               borderRight: (i + 1) % 3 !== 0 ? '1px solid var(--c-s200)' : 'none',
               borderBottom: i < 6 ? '1px solid var(--c-s200)' : 'none',
-              background: 'white',
+              background: i % 2 === 1 ? '#EBF4FA' : 'white',
             }}>
               <iconify-icon icon="solar:check-circle-linear" width="16" style={{ color: 'var(--c-primary)', flexShrink: 0, marginTop: 2 }} />
               <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 400, fontSize: '0.85rem', lineHeight: 1.55, color: 'var(--c-fg)' }}>{point}</span>
