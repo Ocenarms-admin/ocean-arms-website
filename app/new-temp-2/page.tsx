@@ -262,7 +262,7 @@ function Navbar() {
           <img
             src="/assets/o-a-logo-bg-rmd (1).png"
             alt="Ocean Arms Technical Services"
-            style={{ height: 48, width: 'auto', objectFit: 'contain' }}
+            style={{ height: 62, width: 'auto', objectFit: 'contain' }}
           />
         </a>
 
@@ -378,16 +378,6 @@ function Hero() {
         padding: '1.5rem 1.5rem', position: 'relative', zIndex: 3,
       }}>
         <div style={{ maxWidth: 660 }}>
-          {/* Eyebrow */}
-          <p style={{
-            fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.65rem',
-            letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(198,223,240,0.9)',
-            marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: 8,
-          }}>
-            <iconify-icon icon="solar:verified-check-linear" width="13" />
-            Dubai, United Arab Emirates
-          </p>
-
           {/* Headline */}
           <h1 style={{ margin: 0, lineHeight: 1.06 }}>
             {[['Marine &', '0.05s', false], ['Industrial', '0.22s', false], ['Solutions.', '0.4s', true]].map(([text, delay, italic]) => (
@@ -447,7 +437,7 @@ function Hero() {
 
           {/* Stats row */}
           <div style={{ display: 'flex', gap: '2.5rem', marginTop: '1.75rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.15)' }}>
-            {[['24/7', 'Emergency Response'], ['4', 'Core Industries'], ['GCC', 'Coverage']].map(([num, label]) => (
+            {[['24/7', 'Emergency Response'], ['4', 'Core Industries'], ['Global', 'Coverage']].map(([num, label]) => (
               <div key={label} style={{ textAlign: 'center' }}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.7rem', fontWeight: 600, color: '#F7FBFF' }}>{num}</div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(198,223,240,0.8)', marginTop: 3 }}>{label}</div>
@@ -558,7 +548,7 @@ function Payment() {
       }}>
         {/* Section header — inline, not absolute */}
         <div style={{ textAlign: 'center', flexShrink: 0 }}>
-          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--c-muted)', marginBottom: '0.4rem' }}>
+          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-block', marginBottom: '0.9rem' }}>
             Rope Access Services
           </p>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 500, color: 'var(--c-deep)', margin: 0 }}>
@@ -740,7 +730,7 @@ function About() {
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5rem', alignItems: 'center' }}>
         {/* Left */}
         <div className="reveal">
-          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--c-muted)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: '1.5rem' }}>
             <iconify-icon icon="solar:info-circle-linear" width="13" />
             About Us
           </p>
@@ -878,7 +868,7 @@ function Features() {
     <section id="pillars" ref={sectionRef} style={{ height: '300vh', position: 'relative' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
         <div className="reveal" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--c-muted)', marginBottom: '0.75rem' }}>
+          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-block', marginBottom: '1rem' }}>
             Core Values
           </p>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 500, color: 'var(--c-deep)', margin: 0 }}>
@@ -976,7 +966,7 @@ function Testimonials() {
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', position: 'relative', zIndex: 1 }}>
         {/* Header */}
         <div className="reveal" style={{ textAlign: 'center', marginBottom: '4.5rem' }}>
-          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--c-muted)', marginBottom: '0.75rem' }}>
+          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-block', marginBottom: '1rem' }}>
             Who We Are
           </p>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 500, color: 'var(--c-deep)', margin: 0 }}>
@@ -1091,10 +1081,11 @@ function Testimonials() {
    13. INDUSTRIES
 ═══════════════════════════════════════ */
 const INDUSTRIES = [
-  { title: 'Oil & Gas',           href: '/industries/oil-and-gas',        image: '/assets/oil-gas.jpg',  icon: 'solar:oil-linear',       desc: 'Rope access inspection, maintenance, and support services for onshore and offshore oil and gas facilities throughout the GCC.' },
-  { title: 'Marine & Shipping',   href: '/industries/marine-and-shipping', image: '/assets/marine.jpg',   icon: 'solar:ship-linear',      desc: 'Ship repair support, vessel maintenance, hull cleaning, cargo hold cleaning, and specialist marine manpower across UAE ports.' },
-  { title: 'Power & Energy',      href: '/industries/power-and-energy',    image: '/assets/power.jpg',    icon: 'solar:lightning-linear', desc: 'Power plant maintenance, shutdown support, heat exchanger cleaning, and structural services for conventional and renewable energy.' },
-  { title: 'Civil & Construction',href: '/industries/civil-and-construction',image: '/assets/civil.jpg', icon: 'solar:buildings-linear', desc: 'High-rise facade maintenance, building cleaning, structural repairs, and specialist access services for commercial and industrial projects.' },
+  { title: 'Oil & Gas',           href: '/industries/oil-and-gas',        image: '/assets/oil-gas.jpg',    icon: 'solar:oil-linear',         desc: 'Rope access inspection, maintenance, and support services for onshore and offshore oil and gas facilities throughout the GCC.' },
+  { title: 'Marine & Shipping',   href: '/industries/marine-and-shipping', image: '/assets/marine.jpg',     icon: 'solar:ship-linear',        desc: 'Ship repair support, vessel maintenance, hull cleaning, cargo hold cleaning, and specialist marine manpower across UAE ports.' },
+  { title: 'Power & Energy',      href: '/industries/power-and-energy',    image: '/assets/power.jpg',      icon: 'solar:lightning-linear',   desc: 'Power plant maintenance, shutdown support, heat exchanger cleaning, and structural services for conventional and renewable energy.' },
+  { title: 'Civil & Construction',href: '/industries/civil-and-construction',image: '/assets/civil.jpg',   icon: 'solar:buildings-linear',   desc: 'High-rise facade maintenance, building cleaning, structural repairs, and specialist access services for commercial and industrial projects.' },
+  { title: 'Ship Designing',      href: '/industries/ship-designing',      image: '/assets/hero-ship.jpg',  icon: 'solar:ruler-pen-linear',   desc: 'Naval architecture and complete ship design services — from concept drawings and structural calculations to build-ready technical documentation for commercial and industrial vessels.' },
 ];
 
 function Industries() {
@@ -1102,13 +1093,50 @@ function Industries() {
     <section id="industries" style={{ padding: '7rem 0', background: 'var(--c-s100)' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
         <div className="reveal" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--c-muted)', marginBottom: '0.75rem' }}>Industries We Serve</p>
+          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-block', marginBottom: '1rem' }}>Industries We Serve</p>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 500, color: 'var(--c-deep)', margin: 0 }}>
-            Four sectors. <em>One multidisciplinary team.</em>
+            Five sectors. <em>One multidisciplinary team.</em>
           </h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-          {INDUSTRIES.map(({ title, href, image, icon, desc }) => (
+
+        {/* Featured left card + 2×2 right grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gridTemplateRows: 'auto auto', gap: '1.5rem', alignItems: 'stretch' }}>
+
+          {/* Featured card — spans both rows */}
+          <a href={INDUSTRIES[0].href} className="reveal" style={{
+            gridColumn: '1', gridRow: '1 / 3',
+            position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+            overflow: 'hidden', borderRadius: '1.75rem', minHeight: 520,
+            textDecoration: 'none', transition: 'transform 0.3s',
+          }}
+            onMouseEnter={(e) => { if (prefersHover) (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={INDUSTRIES[0].image} alt={INDUSTRIES[0].title} style={{
+              position: 'absolute', inset: 0, width: '100%', height: '100%',
+              objectFit: 'cover', transition: 'transform 0.6s',
+            }}
+              onMouseEnter={(e) => { if (prefersHover) e.currentTarget.style.transform = 'scale(1.05)'; }}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(12,35,64,0.92) 0%, rgba(12,35,64,0.45) 50%, transparent 100%)' }} />
+            <div style={{ position: 'relative', padding: '2.25rem' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 9999, padding: '0.3rem 0.85rem', marginBottom: '1rem' }}>
+                <iconify-icon icon={INDUSTRIES[0].icon} width="14" style={{ color: 'rgba(255,255,255,0.85)' }} />
+                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.62rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.85)' }}>Featured</span>
+              </div>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.75rem', fontWeight: 600, color: '#fff', margin: '0 0 0.75rem', lineHeight: 1.2 }}>{INDUSTRIES[0].title}</h3>
+              <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.88rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.72)', margin: '0 0 1.5rem' }}>{INDUSTRIES[0].desc}</p>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.15)', borderRadius: 9999, padding: '0.55rem 1.1rem', border: '1px solid rgba(255,255,255,0.25)' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.62rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#fff' }}>View services</span>
+                <iconify-icon icon="solar:arrow-right-linear" width="14" style={{ color: '#fff' }} />
+              </div>
+            </div>
+          </a>
+
+          {/* Regular cards — 2×2 on the right */}
+          {INDUSTRIES.slice(1).map(({ title, href, image, icon, desc }) => (
             <a key={href} href={href} className="reveal" style={{
               display: 'flex', flexDirection: 'column', overflow: 'hidden',
               background: 'white', borderRadius: '1.75rem',
@@ -1118,21 +1146,19 @@ function Industries() {
               onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 24px 64px rgba(12,35,64,0.16)'; if (prefersHover) (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 40px rgba(12,35,64,0.09)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
             >
-              {/* Image */}
-              <div style={{ position: 'relative', height: 210, overflow: 'hidden' }}>
+              <div style={{ position: 'relative', height: 180, overflow: 'hidden' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={image} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.5s' }}
                   onMouseEnter={(e) => { if (prefersHover) e.currentTarget.style.transform = 'scale(1.05)'; }}
                   onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                 />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(12,35,64,0.5), transparent)' }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(12,35,64,0.4), transparent)' }} />
               </div>
-              {/* Content */}
-              <div style={{ padding: '1.75rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.35rem', fontWeight: 600, color: 'var(--c-deep)', margin: '0 0 0.75rem' }}>{title}</h3>
-                <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.88rem', lineHeight: 1.7, color: 'var(--c-fg)', margin: '0 0 1.25rem', flex: 1 }}>{desc}</p>
+              <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 600, color: 'var(--c-deep)', margin: '0 0 0.6rem' }}>{title}</h3>
+                <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.84rem', lineHeight: 1.65, color: 'var(--c-fg)', margin: '0 0 1rem', flex: 1 }}>{desc}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.62rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--c-primary)' }}>View services</span>
+                  <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--c-primary)' }}>View services</span>
                   <iconify-icon icon="solar:arrow-right-linear" width="14" style={{ color: 'var(--c-primary)' }} />
                 </div>
               </div>
@@ -1164,7 +1190,7 @@ function WhyChoose() {
     <section id="why-us" style={{ padding: '7rem 0', background: 'var(--c-bg)' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
         <div className="reveal" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.65rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--c-muted)', marginBottom: '0.75rem' }}>Why Choose Us</p>
+          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-block', marginBottom: '1rem' }}>Why Choose Us</p>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 500, color: 'var(--c-deep)', margin: 0 }}>
             Strength across <em>every discipline</em>
           </h2>

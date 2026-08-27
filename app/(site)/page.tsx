@@ -87,7 +87,7 @@ const stats = [
   { value: "24/7", label: "Emergency response" },
   { value: "IRATA", label: "Certified technicians" },
   { value: "4", label: "Core industries" },
-  { value: "GCC", label: "Coverage" },
+  { value: "Global", label: "Coverage" },
 ];
 
 const coreValues = [

@@ -78,7 +78,7 @@ export default function NavbarV2() {
             <img
               src="/assets/o-a-logo-bg-rmd (1).png"
               alt="Ocean Arms Technical Services"
-              style={{ height: 42, width: "auto", objectFit: "contain" }}
+              style={{ height: 62, width: "auto", objectFit: "contain" }}
             />
           </Link>
 
