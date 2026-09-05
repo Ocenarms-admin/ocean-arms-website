@@ -188,7 +188,147 @@ function GlobalStyles() {
         padding: 3.5rem;
         gap: 1.5rem;
       }
+      .vm-front {
+        align-items: stretch;
+        justify-content: flex-end;
+        text-align: left;
+        padding: 0;
+        gap: 0;
+      }
       .vm-back { transform: rotateY(180deg); }
+      .vm-card.is-flipped { transform: rotateY(180deg); }
+
+      /* ── Mobile-only layout fixes (desktop unchanged) ── */
+      @media (max-width: 768px) {
+        .nt2-nav-inner { padding: 0 1rem !important; }
+        .nt2-nav-logo { height: 46px !important; }
+        .nt2-nav-links-text { display: none !important; }
+        .nt2-nav-cta { padding: 0.55rem 1rem !important; font-size: 0.62rem !important; }
+
+        .nt2-hero-inner { padding: 1rem 1rem 2rem !important; }
+        .nt2-hero-stats { gap: 1.25rem !important; flex-wrap: wrap !important; }
+
+        .nt2-services-section {
+          height: auto !important;
+        }
+        .nt2-services-sticky {
+          position: relative !important;
+          height: auto !important;
+          padding: 4.5rem 1rem 3rem !important;
+          justify-content: flex-start !important;
+          overflow: visible !important;
+        }
+        .nt2-services-grid {
+          grid-template-columns: 1fr !important;
+          gap: 1rem !important;
+          flex: none !important;
+          min-height: auto !important;
+        }
+        .nt2-service-row {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+        .nt2-services-grid .ms-item {
+          opacity: 1 !important;
+        }
+        .nt2-services-grid .ms-item .ms-dot {
+          background: var(--c-deep) !important;
+          transform: scale(1.25) !important;
+        }
+        .nt2-services-grid .ms-item .ms-content {
+          opacity: 1 !important;
+        }
+        .nt2-connector-fill {
+          transform: scaleY(1) !important;
+        }
+
+        .nt2-footer-grid {
+          grid-template-columns: 1fr 1fr !important;
+          gap: 2rem 1.25rem !important;
+        }
+        .nt2-footer-brand { grid-column: 1 / -1 !important; }
+        .nt2-footer-bottom { flex-direction: column !important; align-items: flex-start !important; gap: 0.85rem !important; }
+        .nt2-footer-legal { gap: 1rem !important; flex-wrap: wrap !important; }
+
+        .nt2-about-grid {
+          grid-template-columns: 1fr !important;
+          gap: 2.5rem !important;
+        }
+
+        .nt2-feat-section {
+          height: auto !important;
+        }
+        .nt2-feat-sticky {
+          position: relative !important;
+          height: auto !important;
+          padding: 4rem 1rem !important;
+          overflow: visible !important;
+        }
+        .nt2-feat-header { margin-bottom: 1.75rem !important; padding: 0 0.5rem !important; }
+        .nt2-feat-deck {
+          position: relative !important;
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 1rem !important;
+          width: 100% !important;
+          max-width: 420px !important;
+          height: auto !important;
+          perspective: none !important;
+        }
+        .nt2-feat-deck .feat-card {
+          position: relative !important;
+          inset: auto !important;
+          width: 100% !important;
+          height: auto !important;
+          min-height: 0 !important;
+          padding: 1.5rem !important;
+          transform: none !important;
+          box-shadow: 0 10px 28px rgba(53,128,177,0.18), 0 2px 8px rgba(12,35,64,0.06) !important;
+        }
+
+        .nt2-vm-row {
+          flex-direction: column !important;
+          align-items: center !important;
+          gap: 1.25rem !important;
+        }
+        .nt2-vm-flip {
+          width: min(340px, 100%) !important;
+          height: 460px !important;
+        }
+        .vm-face { padding: 2rem 1.5rem !important; }
+        .vm-front { padding: 0 !important; }
+
+        .nt2-industries-grid {
+          grid-template-columns: 1fr !important;
+          grid-template-rows: none !important;
+        }
+        .nt2-industries-featured {
+          grid-column: auto !important;
+          grid-row: auto !important;
+          min-height: 360px !important;
+        }
+
+        .nt2-why-grid { grid-template-columns: 1fr !important; }
+        .nt2-why-sub { grid-template-columns: 1fr !important; }
+
+        .nt2-cta-inner {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+        }
+
+        .nt2-section-pad {
+          padding-top: 4rem !important;
+          padding-bottom: 4rem !important;
+        }
+
+        .nt2-hero-title span {
+          font-size: clamp(2.4rem, 11vw, 3.4rem) !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .nt2-footer-grid { grid-template-columns: 1fr !important; }
+      }
 
       /* ── Reduced motion ── */
       @media (prefers-reduced-motion: reduce) {
@@ -255,11 +395,12 @@ function Navbar() {
       transition: 'background 0.4s ease',
       boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
     }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', width: '100%', padding: '0 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div className="nt2-nav-inner" style={{ maxWidth: 1280, margin: '0 auto', width: '100%', padding: '0 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {/* Logo */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <a href="#" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
           <img
+            className="nt2-nav-logo"
             src={pastHero ? '/assets/o-a-logo-bg-rmd%20(1).png' : '/assets/o-a-logo-bg-light.png'}
             alt="Ocean Arms Technical Services"
             style={{ height: 62, width: 'auto', objectFit: 'contain', transition: 'opacity 0.3s ease' }}
@@ -269,7 +410,7 @@ function Navbar() {
         {/* Links */}
         <div style={{ display: 'flex', gap: '2.2rem', alignItems: 'center' }}>
           {[['Services', '#process'], ['Industries', '#gallery'], ['Capabilities', '#services'], ['FAQ', '#faq']].map(([label, href]) => (
-            <a key={label} href={href} style={{
+            <a key={label} href={href} className="nt2-nav-links-text" style={{
               fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.7rem',
               letterSpacing: '0.14em', textTransform: 'uppercase',
               color: pastHero ? 'var(--c-fg)' : 'rgba(247,251,255,0.82)', textDecoration: 'none',
@@ -280,7 +421,7 @@ function Navbar() {
               {label}
             </a>
           ))}
-          <button style={{
+          <button className="nt2-nav-cta" style={{
             fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.7rem',
             letterSpacing: '0.1em', textTransform: 'uppercase',
             background: pastHero ? 'var(--c-deep)' : 'rgba(255,255,255,0.15)', color: 'white',
@@ -373,13 +514,13 @@ function Hero() {
 
 
       {/* ── Content ── */}
-      <div style={{
+      <div className="nt2-hero-inner" style={{
         maxWidth: 1280, margin: '0 auto', width: '100%',
         padding: '1.5rem 1.5rem', position: 'relative', zIndex: 3,
       }}>
         <div style={{ maxWidth: 660 }}>
           {/* Headline */}
-          <h1 style={{ margin: 0, lineHeight: 1.06 }}>
+          <h1 className="nt2-hero-title" style={{ margin: 0, lineHeight: 1.06 }}>
             {[['Marine &', '0.05s', false], ['Industrial', '0.22s', false], ['Solutions.', '0.4s', true]].map(([text, delay, italic]) => (
               <span key={text as string} className="cta-bounce" style={{
                 display: 'block',
@@ -436,7 +577,7 @@ function Hero() {
           </div>
 
           {/* Stats row */}
-          <div style={{ display: 'flex', gap: '2.5rem', marginTop: '1.75rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.15)' }}>
+          <div className="nt2-hero-stats" style={{ display: 'flex', gap: '2.5rem', marginTop: '1.75rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.15)' }}>
             {[['24/7', 'Emergency Response'], ['4', 'Core Industries'], ['Global', 'Coverage']].map(([num, label]) => (
               <div key={label} style={{ textAlign: 'center' }}>
                 <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.7rem', fontWeight: 600, color: '#F7FBFF' }}>{num}</div>
@@ -484,6 +625,9 @@ function Payment() {
   const animate = useCallback(() => {
     const section = sectionRef.current;
     if (!section) return;
+
+    // Mobile: content stays static — no scroll scrubbing
+    if (window.innerWidth <= 768) return;
 
     const rect = section.getBoundingClientRect();
     const scrollable = section.offsetHeight - window.innerHeight;
@@ -538,25 +682,69 @@ function Payment() {
   }, [animate]);
 
   return (
-    <section id="services" ref={sectionRef} style={{ height: '350vh', position: 'relative' }}>
-      <div style={{
+    <section id="services" ref={sectionRef} className="nt2-services-section" style={{ height: '350vh', position: 'relative' }}>
+      <div className="nt2-services-sticky" style={{
         position: 'sticky', top: 0, height: '100vh',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        background: 'var(--c-bg)', overflow: 'hidden',
+        overflow: 'hidden',
         padding: '5rem 2rem 1.5rem',
         gap: '1.5rem',
       }}>
-        {/* Section header — inline, not absolute */}
-        <div style={{ textAlign: 'center', flexShrink: 0 }}>
-          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-block', marginBottom: '0.9rem' }}>
-            Rope Access Services
-          </p>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 500, color: 'var(--c-deep)', margin: 0 }}>
-            What We Do <em>at Height</em>
-          </h2>
+        {/* Rope access background */}
+        <div aria-hidden="true" style={{
+          position: 'absolute', inset: 0, zIndex: 0,
+          backgroundImage: 'url(/assets/rope-access-section-bg.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 30%',
+        }} />
+        <div aria-hidden="true" style={{
+          position: 'absolute', inset: 0, zIndex: 0,
+          background: 'linear-gradient(180deg, rgba(247,251,255,0.48) 0%, rgba(235,244,250,0.32) 45%, rgba(247,251,255,0.52) 100%)',
+        }} />
+
+        {/* Section header — stacked editorial with soft scrim */}
+        <div style={{
+          position: 'relative', zIndex: 1, flexShrink: 0,
+          marginTop: '1.25rem', width: '100%', maxWidth: 1100,
+          display: 'flex', justifyContent: 'center',
+        }}>
+          <div style={{
+            position: 'relative', padding: '1rem 1.5rem 1.1rem',
+            textAlign: 'center',
+          }}>
+            <div aria-hidden="true" style={{
+              position: 'absolute',
+              inset: '-0.2rem -0.75rem -0.4rem',
+              background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.55) 0%, rgba(247,251,255,0.28) 42%, rgba(247,251,255,0) 70%)',
+              filter: 'blur(1.5px)',
+              pointerEvents: 'none',
+            }} />
+            <p style={{
+              position: 'relative', zIndex: 1, margin: '0 0 0.45rem',
+              fontFamily: 'var(--font-display)', fontWeight: 600,
+              fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase',
+              color: 'var(--c-deep)',
+            }}>
+              What We Do at Height
+            </p>
+            <h2 style={{
+              position: 'relative', zIndex: 1, margin: 0,
+              fontFamily: 'var(--font-serif)', fontWeight: 600,
+              fontSize: 'clamp(1.75rem, 3.6vw, 2.75rem)',
+              color: 'var(--c-deep)', lineHeight: 1.15, letterSpacing: '-0.02em',
+              textShadow: '0 1px 0 rgba(255,255,255,0.5)',
+            }}>
+              Rope Access Services
+            </h2>
+            <div aria-hidden="true" style={{
+              position: 'relative', zIndex: 1,
+              width: 64, height: 3, margin: '0.85rem auto 0', borderRadius: 9999,
+              background: 'linear-gradient(90deg, rgba(53,128,177,0.15), var(--c-primary), rgba(53,128,177,0.15))',
+            }} />
+          </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', maxWidth: 1100, width: '100%', alignItems: 'stretch', flex: 1, minHeight: 0 }}>
+        <div className="nt2-services-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', maxWidth: 1100, width: '100%', alignItems: 'stretch', flex: 1, minHeight: 0, position: 'relative', zIndex: 1 }}>
           {/* Left: services card */}
           <div style={{ background: 'white', borderRadius: '1.5rem', padding: '1.5rem', boxShadow: '0 16px 60px rgba(12,35,64,0.1)', border: '1px solid var(--c-s200)', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', flexShrink: 0 }}>
@@ -569,7 +757,7 @@ function Payment() {
             </div>
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               {ROPE_SERVICES.map((svc, i) => (
-                <div key={i} ref={(el) => { serviceRefs.current[i] = el; }} style={{
+                <div key={i} ref={(el) => { serviceRefs.current[i] = el; }} className="nt2-service-row" style={{
                   display: 'flex', alignItems: 'center', gap: '0.75rem',
                   borderBottom: i < ROPE_SERVICES.length - 1 ? '1px solid var(--c-s200)' : 'none',
                   paddingBottom: i < ROPE_SERVICES.length - 1 ? '0.5rem' : 0,
@@ -604,7 +792,7 @@ function Payment() {
                       <div className="ms-dot" style={{ width: 12, height: 12, borderRadius: '50%', background: 'var(--c-s300)', flexShrink: 0, marginTop: 2, border: '2px solid white', boxShadow: '0 0 0 2px var(--c-s200)' }} />
                       {i < PROJECT_STAGES.length - 1 && (
                         <div style={{ flex: 1, width: 2, background: 'var(--c-s200)', borderRadius: 9999, marginTop: 4, marginBottom: 4, position: 'relative' }}>
-                          <div ref={(el) => { connectorRefs.current[i] = el; }} style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '100%', background: 'var(--c-deep)', borderRadius: 9999, transform: 'scaleY(0)', transformOrigin: 'top' }} />
+                          <div ref={(el) => { connectorRefs.current[i] = el; }} className="nt2-connector-fill" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '100%', background: 'var(--c-deep)', borderRadius: 9999, transform: 'scaleY(0)', transformOrigin: 'top' }} />
                         </div>
                       )}
                     </div>
@@ -638,9 +826,9 @@ function Footer() {
     <footer style={{ background: 'var(--c-deep)', color: '#FAFAFA', padding: '5rem 0 3rem' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
         {/* Top */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '3rem', paddingBottom: '4rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="nt2-footer-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '3rem', paddingBottom: '4rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
           {/* Brand */}
-          <div>
+          <div className="nt2-footer-brand">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/assets/o-a-logo-bg-light.png"
@@ -692,7 +880,7 @@ function Footer() {
           {/* Links */}
           {[
             ['Services', ['Rope Access', 'Inspection & NDT', 'Blasting & Painting', 'Welding Repairs']],
-            ['Industries', ['Oil & Gas', 'Marine & Shipping', 'Power & Energy', 'Civil & Construction']],
+            ['Industries', ['Oil & Gas', 'Marine & Shipping', 'Power & Energy', 'Civil & Construction', 'Ship Designing']],
             ['Company', ['About Us', 'Certifications', 'FAQ', 'Contact Us']],
           ].map(([heading, links]) => (
             <div key={heading as string}>
@@ -718,11 +906,11 @@ function Footer() {
         </div>
 
         {/* Bottom */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <div className="nt2-footer-bottom" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
           <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.8rem', color: 'rgba(250,250,250,0.35)', margin: 0 }}>
             © 2026 Ocean Arms Technical Services LLC. All rights reserved. Dubai, UAE.
           </p>
-          <div style={{ display: 'flex', gap: '2rem' }}>
+          <div className="nt2-footer-legal" style={{ display: 'flex', gap: '2rem' }}>
             {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((link) => (
               <a key={link} href="#" style={{
                 fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.78rem',
@@ -745,8 +933,8 @@ function Footer() {
 ═══════════════════════════════════════ */
 function About() {
   return (
-    <section id="about" style={{ padding: '7rem 0', background: 'var(--c-bg)' }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5rem', alignItems: 'center' }}>
+    <section id="about" className="nt2-section-pad" style={{ padding: '7rem 0', background: 'var(--c-bg)' }}>
+      <div className="nt2-about-grid" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5rem', alignItems: 'center' }}>
         {/* Left */}
         <div className="reveal">
           <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: '1.5rem' }}>
@@ -835,6 +1023,9 @@ function Features() {
     const deck = deckRef.current;
     if (!section || !deck) return;
 
+    // Mobile: static column layout — no scroll fan-out
+    if (window.innerWidth <= 768) return;
+
     const rect = section.getBoundingClientRect();
     const scrollable = section.offsetHeight - window.innerHeight;
     const raw = Math.max(0, Math.min(1, -rect.top / scrollable));
@@ -842,8 +1033,8 @@ function Features() {
     const p = progressRef.current;
 
     const cards = deck.querySelectorAll<HTMLElement>('.feat-card');
-    const txMap    = [-310, -103,  103,  310];
-    const rotMap   = [ -13,   -4,    4,   13];
+    const txMap    = [-310, -103, 103, 310];
+    const rotMap   = [-13, -4, 4, 13];
     const scaleMap = [0.85, 0.93, 0.93, 0.85];
     cards.forEach((card, i) => {
       const tx    = p * txMap[i];
@@ -884,9 +1075,9 @@ function Features() {
   }, [animate]);
 
   return (
-    <section id="pillars" ref={sectionRef} style={{ height: '300vh', position: 'relative' }}>
-      <div style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-        <div className="reveal" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+    <section id="pillars" ref={sectionRef} className="nt2-feat-section" style={{ height: '300vh', position: 'relative' }}>
+      <div className="nt2-feat-sticky" style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        <div className="reveal nt2-feat-header" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
           <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-block', marginBottom: '1rem' }}>
             Core Values
           </p>
@@ -895,7 +1086,7 @@ function Features() {
           </h2>
         </div>
 
-        <div ref={deckRef} style={{ position: 'relative', width: 420, height: 360, perspective: '1200px' }}>
+        <div ref={deckRef} className="nt2-feat-deck" style={{ position: 'relative', width: 420, height: 360, perspective: '1200px' }}>
           {CARDS.map(({ icon, tag, title, body, bg, color, accent }, i) => (
             <div key={i} className="feat-card" style={{
               background: bg,
@@ -942,40 +1133,28 @@ const VM_CARDS = [
   {
     icon: 'solar:eye-linear',
     label: 'Vision',
+    tagline: 'Leading UAE marine & industrial excellence',
     heading: 'To be the leading technical services provider in the UAE marine and industrial sector',
     body: 'We aspire to build a reputation for excellence, reliability, and safety — becoming the partner of choice for asset owners and operators across the GCC and beyond.',
-    frontBg: 'rgba(255,255,255,0.82)',
-    frontBorder: 'rgba(12,35,64,0.08)',
-    frontBorderTop: 'rgba(53,128,177,0.25)',
-    frontInset: 'rgba(255,255,255,0.9)',
     backBg: '#0C2340',
-    backBorder: 'rgba(53,128,177,0.3)',
-    iconBg: 'var(--c-s100)',
-    iconBorder: 'rgba(53,128,177,0.25)',
-    frontImage: '/assets/vm-vision-horizon.png',
-    frontOverlay: true,
+    frontImage: '/assets/vm-vision-compass.png',
   },
   {
     icon: 'solar:target-linear',
     label: 'Mission',
+    tagline: 'Safe, compliant & high-quality delivery',
     heading: 'What drives every decision we make',
     body: 'To deliver safe, compliant, and high-quality services on every engagement — building long-term partnerships through reliability, technical excellence, and integrity in all client relationships.',
-    frontBg: 'rgba(235,244,250,0.85)',
-    frontBorder: 'rgba(53,128,177,0.12)',
-    frontBorderTop: 'rgba(53,128,177,0.3)',
-    frontInset: 'rgba(255,255,255,0.8)',
     backBg: '#162D45',
-    backBorder: 'rgba(53,128,177,0.35)',
-    iconBg: 'var(--c-s200)',
-    iconBorder: 'rgba(53,128,177,0.3)',
-    frontImage: '/assets/vm-mission-compass.png',
-    frontOverlay: true,
+    frontImage: '/assets/vm-mission-target.png',
   },
 ];
 
 function Testimonials() {
+  const [flipped, setFlipped] = useState<string | null>(null);
+
   return (
-    <section style={{
+    <section className="nt2-section-pad" style={{
       background: 'var(--c-bg)',
       padding: '7rem 0',
       position: 'relative',
@@ -994,71 +1173,76 @@ function Testimonials() {
         </div>
 
         {/* Flip cards */}
-        <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center' }}>
-          {VM_CARDS.map(({ icon, label, heading, body, frontBg, frontBorder, frontBorderTop, frontInset, backBg, backBorder, iconBg, iconBorder, frontImage, frontOverlay }: any) => (
-            <div key={label} className="reveal vm-flip" style={{ width: 340, flexShrink: 0, height: 520 }}>
-              <div className="vm-card">
+        <div className="nt2-vm-row" style={{ display: 'flex', gap: '2rem', justifyContent: 'center' }}>
+          {VM_CARDS.map(({ icon, label, tagline, heading, body, backBg, frontImage }) => (
+            <div
+              key={label}
+              className="reveal vm-flip nt2-vm-flip"
+              style={{ width: 340, flexShrink: 0, height: 520 }}
+              onClick={() => {
+                if (prefersHover) return;
+                setFlipped((prev) => (prev === label ? null : label));
+              }}
+            >
+              <div className={`vm-card${flipped === label ? ' is-flipped' : ''}`}>
 
-                {/* Front face — icon + pill title */}
-                <div className="vm-face" style={{
-                  background: frontBg,
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  border: `1px solid ${frontBorder}`,
-                  borderTop: `1px solid ${frontBorderTop}`,
-                  boxShadow: `0 16px 56px rgba(12,35,64,0.10), inset 0 1px 0 ${frontInset}`,
+                {/* Front face — destination-style photo card */}
+                <div className="vm-face vm-front" style={{
+                  background: '#0C2340',
+                  border: 'none',
+                  boxShadow: '0 20px 48px rgba(12,35,64,0.16)',
                   overflow: 'hidden',
                 }}>
-                  {frontImage && (
-                    <>
-                      <div style={{
-                        position: 'absolute', inset: 0,
-                        backgroundImage: `url(${frontImage})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        opacity: frontOverlay ? 0.55 : 1,
-                        filter: frontOverlay ? 'grayscale(100%)' : 'none',
-                        borderRadius: 'inherit',
-                      }} />
-                      {frontOverlay && (
-                        <div style={{
-                          position: 'absolute', inset: 0,
-                          background: 'rgba(22,45,69,0.6)',
-                          borderRadius: 'inherit',
-                        }} />
-                      )}
-                    </>
-                  )}
-                  {/* Icon circle */}
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    backgroundImage: `url(${frontImage})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }} />
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.12) 38%, rgba(0,0,0,0.55) 68%, rgba(0,0,0,0.78) 100%)',
+                  }} />
+
                   <div style={{
                     position: 'relative', zIndex: 1,
-                    width: 72, height: 72, borderRadius: '50%',
-                    background: frontOverlay ? 'rgba(255,255,255,0.18)' : iconBg,
-                    border: frontOverlay ? '1.5px solid rgba(255,255,255,0.45)' : `1px solid ${iconBorder}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: frontImage ? '0 4px 18px rgba(0,0,0,0.25)' : '0 8px 24px rgba(0,0,0,0.3)',
+                    padding: '1.5rem 1.35rem 1.35rem',
+                    display: 'flex', flexDirection: 'column', gap: '0.55rem',
                   }}>
-                    <iconify-icon icon={icon} width="30" style={{ color: frontOverlay ? '#ffffff' : 'var(--c-deep)' }} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                      <h3 style={{
+                        fontFamily: 'var(--font-display)', fontWeight: 600,
+                        fontSize: '1.55rem', color: '#FFFFFF', margin: 0, letterSpacing: '-0.01em',
+                      }}>
+                        Our {label}
+                      </h3>
+                      <iconify-icon icon={icon} width="20" style={{ color: 'rgba(255,255,255,0.9)' }} />
+                    </div>
+                    <p style={{
+                      fontFamily: 'var(--font-sans)', fontWeight: 400,
+                      fontSize: '0.82rem', color: 'rgba(247,251,255,0.78)',
+                      margin: '0 0 0.55rem', lineHeight: 1.4,
+                    }}>
+                      {tagline}
+                    </p>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      background: 'rgba(8,22,40,0.72)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '0.9rem',
+                      padding: '0.85rem 1.1rem',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                    }}>
+                      <span style={{
+                        fontFamily: 'var(--font-display)', fontWeight: 500,
+                        fontSize: '0.88rem', color: '#FFFFFF',
+                      }}>
+                        Learn More
+                      </span>
+                      <iconify-icon icon="solar:alt-arrow-right-linear" width="18" style={{ color: '#FFFFFF' }} />
+                    </div>
                   </div>
-
-                  {/* Pill title */}
-                  <div style={{
-                    position: 'relative', zIndex: 1,
-                    padding: '0.6rem 2rem',
-                    border: frontOverlay ? '1px solid rgba(255,255,255,0.3)' : '1px solid var(--c-s200)',
-                    borderRadius: 9999,
-                    background: frontOverlay ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.6)',
-                    boxShadow: frontImage ? '0 2px 12px rgba(0,0,0,0.15)' : 'none',
-                  }}>
-                    <span style={{ fontFamily: 'var(--font-serif)', fontWeight: 600, fontSize: '1.4rem', color: frontOverlay ? '#ffffff' : 'var(--c-deep)', letterSpacing: '0.01em' }}>
-                      Our {label}
-                    </span>
-                  </div>
-
-                  {/* Hover hint */}
-                  <p style={{ position: 'relative', zIndex: 1, fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.62rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: frontOverlay ? 'rgba(255,255,255,0.7)' : 'var(--c-deep)', margin: 0 }}>
-                    Hover to learn more
-                  </p>
                 </div>
 
                 {/* Back face — description */}
@@ -1066,8 +1250,7 @@ function Testimonials() {
                   background: backBg,
                   backdropFilter: 'blur(24px)',
                   WebkitBackdropFilter: 'blur(24px)',
-                  border: `1px solid ${backBorder}`,
-                  borderTop: `1px solid rgba(128,184,216,0.28)`,
+                  border: 'none',
                   boxShadow: '0 32px 80px rgba(0,0,0,0.4)',
                 }}>
                   <p style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.6rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#80B8D8', margin: 0 }}>
@@ -1109,7 +1292,7 @@ const INDUSTRIES = [
 
 function Industries() {
   return (
-    <section id="industries" style={{ padding: '7rem 0', background: 'var(--c-s100)' }}>
+    <section id="industries" className="nt2-section-pad" style={{ padding: '7rem 0', background: 'var(--c-s100)' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
         <div className="reveal" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
           <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-block', marginBottom: '1rem' }}>Industries We Serve</p>
@@ -1119,10 +1302,10 @@ function Industries() {
         </div>
 
         {/* Featured left card + 2×2 right grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gridTemplateRows: 'auto auto', gap: '1.5rem', alignItems: 'stretch' }}>
+        <div className="nt2-industries-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gridTemplateRows: 'auto auto', gap: '1.5rem', alignItems: 'stretch' }}>
 
           {/* Featured card — spans both rows */}
-          <a href={INDUSTRIES[0].href} className="reveal" style={{
+          <a href={INDUSTRIES[0].href} className="reveal nt2-industries-featured" style={{
             gridColumn: '1', gridRow: '1 / 3',
             position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
             overflow: 'hidden', borderRadius: '1.75rem', minHeight: 520,
@@ -1194,20 +1377,29 @@ function Industries() {
 ═══════════════════════════════════════ */
 function WhyChoose() {
   const points = [
-    'Certified rope access technicians',
-    'Full HSSE compliance on every job',
-    '24/7 emergency response capability',
-    'Single-source multidisciplinary team',
-    'Fully equipped with latest tooling',
-    'Proven track record across GCC',
-    'Competitive pricing with quality assurance',
-    'Rapid mobilisation and deployment',
-    'Experienced project management',
+    { icon: 'solar:shield-check-linear', text: 'Certified rope access technicians' },
+    { icon: 'solar:clipboard-check-linear', text: 'Full HSSE compliance on every job' },
+    { icon: 'solar:clock-circle-linear', text: '24/7 emergency response capability' },
+    { icon: 'solar:users-group-rounded-linear', text: 'Single-source multidisciplinary team' },
+    { icon: 'solar:tuning-2-linear', text: 'Fully equipped with latest tooling' },
+    { icon: 'solar:graph-up-linear', text: 'Proven track record across GCC' },
+    { icon: 'solar:tag-price-linear', text: 'Competitive pricing with quality assurance' },
+    { icon: 'solar:rocket-linear', text: 'Rapid mobilisation and deployment' },
+    { icon: 'solar:case-round-linear', text: 'Experienced project management' },
   ];
   const clientSectors = ['ADNOC Group', 'Dubai Petroleum', 'Drydocks World', 'DP World', 'DEWA', 'Gulf Navigation', 'Major EPC Contractors', 'Offshore Operators'];
   return (
-    <section id="why-us" style={{ padding: '7rem 0', background: 'var(--c-bg)' }}>
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
+    <section id="why-us" className="nt2-section-pad" style={{ padding: '7rem 0', background: 'var(--c-bg)', position: 'relative', overflow: 'hidden' }}>
+      <div aria-hidden="true" style={{
+        position: 'absolute', top: '10%', right: '-8%', width: 420, height: 420, borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(53,128,177,0.12) 0%, transparent 70%)', pointerEvents: 'none',
+      }} />
+      <div aria-hidden="true" style={{
+        position: 'absolute', bottom: '5%', left: '-6%', width: 360, height: 360, borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(128,184,216,0.14) 0%, transparent 70%)', pointerEvents: 'none',
+      }} />
+
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', position: 'relative', zIndex: 1 }}>
         <div className="reveal" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
           <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-block', marginBottom: '1rem' }}>Why Choose Us</p>
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 500, color: 'var(--c-deep)', margin: 0 }}>
@@ -1216,45 +1408,157 @@ function WhyChoose() {
         </div>
 
         {/* Points grid */}
-        <div className="reveal" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0', marginBottom: '2rem', border: '1px solid var(--c-s200)', borderRadius: '1.5rem', overflow: 'hidden' }}>
-          {points.map((point, i) => (
-            <div key={point} style={{
-              display: 'flex', alignItems: 'flex-start', gap: '0.75rem',
-              padding: '1.25rem 1.5rem',
-              borderRight: (i + 1) % 3 !== 0 ? '1px solid var(--c-s200)' : 'none',
-              borderBottom: i < 6 ? '1px solid var(--c-s200)' : 'none',
-              background: i % 2 === 1 ? '#EBF4FA' : 'white',
-            }}>
-              <iconify-icon icon="solar:check-circle-linear" width="16" style={{ color: 'var(--c-primary)', flexShrink: 0, marginTop: 2 }} />
-              <span style={{ fontFamily: 'var(--font-sans)', fontWeight: 400, fontSize: '0.85rem', lineHeight: 1.55, color: 'var(--c-fg)' }}>{point}</span>
+        <div className="reveal nt2-why-grid" style={{
+          display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem',
+        }}>
+          {points.map(({ icon, text }, i) => (
+            <div
+              key={text}
+              style={{
+                display: 'flex', alignItems: 'flex-start', gap: '1rem',
+                padding: '1.35rem 1.4rem',
+                background: 'rgba(255,255,255,0.88)',
+                borderRadius: '1.15rem',
+                border: '1.5px solid rgba(53,128,177,0.32)',
+                boxShadow: '0 10px 28px rgba(53,128,177,0.18), 0 2px 8px rgba(12,35,64,0.06)',
+                transition: 'transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease',
+                cursor: 'default',
+              }}
+              onMouseEnter={(e) => {
+                if (!prefersHover) return;
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 18px 44px rgba(53,128,177,0.28), 0 4px 12px rgba(12,35,64,0.1)';
+                e.currentTarget.style.borderColor = 'rgba(53,128,177,0.55)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 10px 28px rgba(53,128,177,0.18), 0 2px 8px rgba(12,35,64,0.06)';
+                e.currentTarget.style.borderColor = 'rgba(53,128,177,0.32)';
+              }}
+            >
+              <div style={{
+                width: 44, height: 44, borderRadius: '0.85rem', flexShrink: 0,
+                background: 'linear-gradient(145deg, #EBF4FA 0%, #C6DFF0 100%)',
+                border: '1px solid rgba(53,128,177,0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <iconify-icon icon={icon} width="20" style={{ color: 'var(--c-deep)' }} />
+              </div>
+              <div style={{ minWidth: 0, paddingTop: 2 }}>
+                <span style={{
+                  fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.58rem',
+                  letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--c-primary)',
+                  display: 'block', marginBottom: '0.35rem',
+                }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span style={{
+                  fontFamily: 'var(--font-sans)', fontWeight: 500, fontSize: '0.92rem',
+                  lineHeight: 1.45, color: 'var(--c-deep)', display: 'block',
+                }}>
+                  {text}
+                </span>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Sub-cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-          <div className="reveal" style={{ background: 'var(--c-s100)', borderRadius: '1.5rem', padding: '2rem', border: '1px solid var(--c-s200)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '1rem' }}>
-              <iconify-icon icon="solar:diploma-linear" width="20" style={{ color: 'var(--c-primary)' }} />
-              <h3 style={{ fontFamily: 'var(--font-serif)', fontWeight: 600, fontSize: '1.1rem', color: 'var(--c-deep)', margin: 0 }}>Quality Assurance</h3>
+        {/* Sub-cards — matched to tile theme */}
+        <div className="nt2-why-sub" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+          {[
+            {
+              key: 'qa',
+              icon: 'solar:diploma-linear',
+              title: 'Quality Assurance',
+              body: 'All works carried out under strict HSSE guidelines with documented quality control processes, third-party inspection support, and full compliance with international standards.',
+              chips: ['HSSE Guidelines', 'QC Documentation', 'Third-Party Inspection', 'Intl. Standards'],
+            },
+            {
+              key: 'sectors',
+              icon: 'solar:buildings-linear',
+              title: 'Client Sectors',
+              body: 'Trusted across energy, marine, and infrastructure operators throughout the UAE and wider GCC.',
+              chips: clientSectors,
+            },
+          ].map(({ key, icon, title, body, chips }) => (
+            <div
+              key={key}
+              className="reveal"
+              style={{
+                background: 'rgba(255,255,255,0.92)',
+                borderRadius: '1.25rem',
+                padding: '1.75rem 1.85rem',
+                border: '1.5px solid rgba(53,128,177,0.32)',
+                boxShadow: '0 10px 28px rgba(53,128,177,0.18), 0 2px 8px rgba(12,35,64,0.06)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.1rem',
+                transition: 'transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (!prefersHover) return;
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 18px 44px rgba(53,128,177,0.28), 0 4px 12px rgba(12,35,64,0.1)';
+                e.currentTarget.style.borderColor = 'rgba(53,128,177,0.55)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 10px 28px rgba(53,128,177,0.18), 0 2px 8px rgba(12,35,64,0.06)';
+                e.currentTarget.style.borderColor = 'rgba(53,128,177,0.32)';
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{
+                  width: 46, height: 46, borderRadius: '0.85rem', flexShrink: 0,
+                  background: 'linear-gradient(145deg, #EBF4FA 0%, #C6DFF0 100%)',
+                  border: '1px solid rgba(53,128,177,0.22)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <iconify-icon icon={icon} width="22" style={{ color: 'var(--c-deep)' }} />
+                </div>
+                <div>
+                  <span style={{
+                    fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.58rem',
+                    letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--c-primary)',
+                    display: 'block', marginBottom: 4,
+                  }}>
+                    {key === 'qa' ? 'Standards' : 'Partners'}
+                  </span>
+                  <h3 style={{ fontFamily: 'var(--font-serif)', fontWeight: 600, fontSize: '1.2rem', color: 'var(--c-deep)', margin: 0 }}>
+                    {title}
+                  </h3>
+                </div>
+              </div>
+
+              <p style={{
+                fontFamily: 'var(--font-sans)', fontWeight: 400, fontSize: '0.9rem',
+                lineHeight: 1.7, color: 'var(--c-fg)', margin: 0,
+              }}>
+                {body}
+              </p>
+
+              <div style={{
+                height: 1, width: '100%',
+                background: 'linear-gradient(90deg, rgba(53,128,177,0.35), rgba(53,128,177,0.05))',
+              }} />
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {chips.map((chip) => (
+                  <span key={chip} style={{
+                    fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.62rem',
+                    letterSpacing: '0.1em', textTransform: 'uppercase',
+                    background: 'linear-gradient(145deg, #F7FBFF 0%, #EBF4FA 100%)',
+                    color: 'var(--c-deep)',
+                    padding: '0.5rem 0.9rem', borderRadius: 9999,
+                    border: '1px solid rgba(53,128,177,0.28)',
+                    boxShadow: '0 2px 8px rgba(53,128,177,0.1)',
+                  }}>
+                    {chip}
+                  </span>
+                ))}
+              </div>
             </div>
-            <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.88rem', lineHeight: 1.7, color: 'var(--c-fg)', margin: 0 }}>
-              All works carried out under strict HSSE guidelines with documented quality control processes, third-party inspection support, and full compliance with international standards.
-            </p>
-          </div>
-          <div className="reveal" style={{ background: 'var(--c-s100)', borderRadius: '1.5rem', padding: '2rem', border: '1px solid var(--c-s200)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: '1rem' }}>
-              <iconify-icon icon="solar:buildings-linear" width="20" style={{ color: 'var(--c-primary)' }} />
-              <h3 style={{ fontFamily: 'var(--font-serif)', fontWeight: 600, fontSize: '1.1rem', color: 'var(--c-deep)', margin: 0 }}>Client Sectors</h3>
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-              {clientSectors.map((sector) => (
-                <span key={sector} style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', background: 'white', color: 'var(--c-fg)', padding: '0.35rem 0.75rem', borderRadius: 9999, border: '1px solid var(--c-s200)' }}>
-                  {sector}
-                </span>
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
@@ -1269,7 +1573,7 @@ function CTABanner() {
     <section style={{ background: 'var(--c-deep)', padding: '5rem 0', position: 'relative', overflow: 'hidden' }}>
       {/* Subtle radial glow */}
       <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 800, height: 400, background: 'radial-gradient(ellipse, rgba(53,128,177,0.18) 0%, transparent 70%)', pointerEvents: 'none' }} />
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '2rem', position: 'relative', zIndex: 1 }}>
+      <div className="nt2-cta-inner" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '2rem', position: 'relative', zIndex: 1 }}>
         <div className="reveal">
           <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)', fontWeight: 500, color: '#F5F5F4', margin: '0 0 0.75rem', maxWidth: 560, lineHeight: 1.2 }}>
             Let&apos;s build something <em>reliable together</em>
