@@ -27,12 +27,13 @@ const SOCIALS = [
 
 const LINK_COLS: [string, [string, string][]][] = [
   [
-    "Services",
+    "Explore",
     [
-      ["Rope Access", "/#services"],
-      ["Inspection & NDT", "/#services"],
-      ["Blasting & Painting", "/#services"],
-      ["Welding Repairs", "/#services"],
+      ["About", "/#about"],
+      ["Industries", "/#industries"],
+      ["Rope Access Service", "/#services"],
+      ["Services", "/#why-us"],
+      ["Contact", "/contact"],
     ],
   ],
   [
@@ -42,16 +43,6 @@ const LINK_COLS: [string, [string, string][]][] = [
       ["Marine & Shipping", "/industries/marine-and-shipping"],
       ["Power & Energy", "/industries/power-and-energy"],
       ["Civil & Construction", "/industries/civil-and-construction"],
-      ["Ship Designing", "/industries/ship-designing"],
-    ],
-  ],
-  [
-    "Company",
-    [
-      ["About Us", "/#about"],
-      ["Certifications", "/#why-us"],
-      ["FAQ", "/#why-us"],
-      ["Contact Us", "/contact"],
     ],
   ],
 ];
@@ -67,7 +58,7 @@ export default function FooterV2() {
           className="nt2-footer-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "1.5fr 1fr 1fr 1fr",
+            gridTemplateColumns: "1.5fr 1fr 1fr",
             gap: "3rem",
             paddingBottom: "4rem",
             borderBottom: "1px solid rgba(255,255,255,0.08)",
@@ -282,35 +273,6 @@ export default function FooterV2() {
             © 2026 Ocean Arms Technical Services LLC. All rights reserved.
             Dubai, UAE.
           </p>
-          <div
-            className="nt2-footer-legal"
-            style={{ display: "flex", gap: "2rem" }}
-          >
-            {["Privacy Policy", "Terms of Service", "Cookie Policy"].map(
-              (link) => (
-                <a
-                  key={link}
-                  href="#"
-                  style={{
-                    fontFamily: "var(--font-sans)",
-                    fontWeight: 300,
-                    fontSize: "0.78rem",
-                    color: "rgba(250,250,250,0.35)",
-                    textDecoration: "none",
-                    transition: "color 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = "rgba(250,250,250,0.6)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = "rgba(250,250,250,0.35)";
-                  }}
-                >
-                  {link}
-                </a>
-              )
-            )}
-          </div>
         </div>
       </div>
 
