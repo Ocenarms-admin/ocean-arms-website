@@ -43,6 +43,7 @@ const LINK_COLS: [string, [string, string][]][] = [
       ["Marine & Shipping", "/industries/marine-and-shipping"],
       ["Power & Energy", "/industries/power-and-energy"],
       ["Civil & Construction", "/industries/civil-and-construction"],
+      ["Ship Designing", "/industries/ship-designing"],
     ],
   ],
 ];

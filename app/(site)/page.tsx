@@ -330,6 +330,46 @@ function GlobalStyles() {
         }
       }
 
+      /* Laptop 1440: sticky 100vh clips the cards — show the full section instead */
+      @media (min-width: 769px) and (max-width: 1440px) {
+        .nt2-services-section {
+          height: auto !important;
+        }
+        .nt2-services-sticky {
+          position: relative !important;
+          height: auto !important;
+          overflow: visible !important;
+          justify-content: flex-start !important;
+          padding: 5.25rem 1.75rem 3.25rem !important;
+          gap: 1.15rem !important;
+        }
+        .nt2-services-header {
+          margin-top: 0 !important;
+        }
+        .nt2-services-grid {
+          flex: none !important;
+          min-height: auto !important;
+          gap: 1.15rem !important;
+        }
+        .nt2-service-row {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+        .nt2-services-grid .ms-item {
+          opacity: 1 !important;
+        }
+        .nt2-services-grid .ms-item .ms-dot {
+          background: var(--c-deep) !important;
+          transform: scale(1.25) !important;
+        }
+        .nt2-services-grid .ms-item .ms-content {
+          opacity: 1 !important;
+        }
+        .nt2-connector-fill {
+          transform: scaleY(1) !important;
+        }
+      }
+
       @media (max-width: 480px) {
         .nt2-footer-grid { grid-template-columns: 1fr !important; }
       }
@@ -557,20 +597,21 @@ function Hero() {
 
           {/* CTAs */}
           <div className="cta-bounce" style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap', animationDelay: '0.72s' }}>
-            <button className="pulse-glow" style={{
+            <a href="/contact" className="pulse-glow" style={{
               fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem',
               letterSpacing: '0.1em', textTransform: 'uppercase',
               background: 'var(--c-primary)', color: 'white',
               border: 'none', borderRadius: 9999, padding: '1rem 2.25rem',
               cursor: 'pointer', boxShadow: '0 8px 36px rgba(53,128,177,0.45)',
               transition: 'transform 0.2s', display: 'flex', alignItems: 'center', gap: 8,
+              textDecoration: 'none',
             }}
               onMouseEnter={(e) => { if (prefersHover) e.currentTarget.style.transform = 'scale(1.04)'; }}
               onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}>
               <iconify-icon icon="solar:document-text-linear" width="16" />
               Request a Quotation
-            </button>
-            <button style={{
+            </a>
+            <a href="/#industries" style={{
               fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.72rem',
               letterSpacing: '0.1em', textTransform: 'uppercase',
               background: 'rgba(255,255,255,0.08)', color: 'rgba(247,251,255,0.88)',
@@ -578,12 +619,13 @@ function Hero() {
               cursor: 'pointer', transition: 'border-color 0.2s, background 0.2s, transform 0.2s',
               backdropFilter: 'blur(8px)',
               display: 'flex', alignItems: 'center', gap: 8,
+              textDecoration: 'none',
             }}
               onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(128,184,216,0.6)'; e.currentTarget.style.background = 'rgba(255,255,255,0.14)'; if (prefersHover) e.currentTarget.style.transform = 'scale(1.04)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.22)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.transform = 'scale(1)'; }}>
               <iconify-icon icon="solar:buildings-linear" width="16" />
               Industries We Serve
-            </button>
+            </a>
           </div>
 
           {/* Stats row */}
@@ -636,8 +678,8 @@ function Payment() {
     const section = sectionRef.current;
     if (!section) return;
 
-    // Mobile: content stays static — no scroll scrubbing
-    if (window.innerWidth <= 768) return;
+    // Mobile / 1440 laptop: content stays static — no scroll scrubbing
+    if (window.innerWidth <= 1440) return;
 
     const rect = section.getBoundingClientRect();
     const scrollable = section.offsetHeight - window.innerHeight;
@@ -713,12 +755,12 @@ function Payment() {
         }} />
 
         {/* Section header — stacked editorial with soft scrim */}
-        <div style={{
+        <div className="nt2-services-header" style={{
           position: 'relative', zIndex: 1, flexShrink: 0,
           marginTop: '1.25rem', width: '100%', maxWidth: 1100,
           display: 'flex', justifyContent: 'center',
         }}>
-          <div style={{
+          <div className="nt2-services-header-inner" style={{
             position: 'relative', padding: '1rem 1.5rem 1.1rem',
             textAlign: 'center',
           }}>
@@ -729,7 +771,7 @@ function Payment() {
               filter: 'blur(1.5px)',
               pointerEvents: 'none',
             }} />
-            <p style={{
+            <p className="nt2-services-kicker" style={{
               position: 'relative', zIndex: 1, margin: '0 0 0.45rem',
               fontFamily: 'var(--font-display)', fontWeight: 600,
               fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase',
@@ -737,7 +779,7 @@ function Payment() {
             }}>
               What We Do at Height
             </p>
-            <h2 style={{
+            <h2 className="nt2-services-title" style={{
               position: 'relative', zIndex: 1, margin: 0,
               fontFamily: 'var(--font-serif)', fontWeight: 600,
               fontSize: 'clamp(1.75rem, 3.6vw, 2.75rem)',
@@ -746,7 +788,7 @@ function Payment() {
             }}>
               Rope Access Services
             </h2>
-            <div aria-hidden="true" style={{
+            <div className="nt2-services-rule" aria-hidden="true" style={{
               position: 'relative', zIndex: 1,
               width: 64, height: 3, margin: '0.85rem auto 0', borderRadius: 9999,
               background: 'linear-gradient(90deg, rgba(53,128,177,0.15), var(--c-primary), rgba(53,128,177,0.15))',
@@ -756,8 +798,8 @@ function Payment() {
 
         <div className="nt2-services-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', maxWidth: 1100, width: '100%', alignItems: 'stretch', flex: 1, minHeight: 0, position: 'relative', zIndex: 1 }}>
           {/* Left: services card */}
-          <div style={{ background: 'white', borderRadius: '1.5rem', padding: '1.5rem', boxShadow: '0 16px 60px rgba(12,35,64,0.1)', border: '1px solid var(--c-s200)', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', flexShrink: 0 }}>
+          <div className="nt2-services-card" style={{ background: 'white', borderRadius: '1.5rem', padding: '1.5rem', boxShadow: '0 16px 60px rgba(12,35,64,0.1)', border: '1px solid var(--c-s200)', display: 'flex', flexDirection: 'column' }}>
+            <div className="nt2-services-card-head" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', flexShrink: 0 }}>
               <h3 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: '1.05rem', color: 'var(--c-deep)', margin: 0 }}>
                 Service Capabilities
               </h3>
@@ -775,12 +817,12 @@ function Payment() {
                   transition: 'opacity 0.5s, transform 0.5s',
                   transitionDelay: `${i * 0.06}s`,
                 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--c-s100)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <div className="nt2-service-icon" style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--c-s100)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     <iconify-icon icon={svc.icon} width="15" style={{ color: 'var(--c-primary)' }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 500, fontSize: '0.8rem', color: 'var(--c-deep)' }}>{svc.name}</div>
-                    <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.72rem', lineHeight: 1.4, color: 'var(--c-muted)' }}>{svc.desc}</div>
+                    <div className="nt2-service-name" style={{ fontFamily: 'var(--font-sans)', fontWeight: 500, fontSize: '0.8rem', color: 'var(--c-deep)' }}>{svc.name}</div>
+                    <div className="nt2-service-desc" style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.72rem', lineHeight: 1.4, color: 'var(--c-muted)' }}>{svc.desc}</div>
                   </div>
                 </div>
               ))}
@@ -790,8 +832,8 @@ function Payment() {
           {/* Right: Project stages */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {/* Project stages */}
-            <div style={{ background: 'white', borderRadius: '1.5rem', padding: '1.25rem', boxShadow: '0 12px 40px rgba(12,35,64,0.08)', border: '1px solid var(--c-s200)', flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <h3 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: '1rem', color: 'var(--c-deep)', margin: '0 0 1rem' }}>
+            <div className="nt2-workflow-card" style={{ background: 'white', borderRadius: '1.5rem', padding: '1.25rem', boxShadow: '0 12px 40px rgba(12,35,64,0.08)', border: '1px solid var(--c-s200)', flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <h3 className="nt2-workflow-title" style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: '1rem', color: 'var(--c-deep)', margin: '0 0 1rem' }}>
                 Project Workflow
               </h3>
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -1297,7 +1339,7 @@ const INDUSTRIES = [
   { title: 'Marine & Shipping',   href: '/industries/marine-and-shipping', image: '/assets/marine.jpg',     icon: 'solar:ship-linear',        desc: 'Ship repair support, vessel maintenance, hull cleaning, cargo hold cleaning, and specialist marine manpower across UAE ports.' },
   { title: 'Power & Energy',      href: '/industries/power-and-energy',    image: '/assets/power.jpg',      icon: 'solar:lightning-linear',   desc: 'Power plant maintenance, shutdown support, heat exchanger cleaning, and structural services for conventional and renewable energy.' },
   { title: 'Civil & Construction',href: '/industries/civil-and-construction',image: '/assets/civil-construction-site.png',   icon: 'solar:buildings-linear',   desc: 'High-rise facade maintenance, building cleaning, structural repairs, and specialist access services for commercial and industrial projects.' },
-  { title: 'Ship Designing',      href: '/industries/ship-designing',      image: '/assets/hero-ship.jpg',  icon: 'solar:ruler-pen-linear',   desc: 'Naval architecture and complete ship design services — from concept drawings and structural calculations to build-ready technical documentation for commercial and industrial vessels.' },
+  { title: 'Ship Designing',      href: '/industries/ship-designing',      image: '/assets/ship-designing-sketch-to-ship.png',  icon: 'solar:ruler-pen-linear',   desc: 'Naval architecture and complete ship design services — from concept drawings and structural calculations to build-ready technical documentation for commercial and industrial vessels.' },
 ];
 
 function Industries() {
