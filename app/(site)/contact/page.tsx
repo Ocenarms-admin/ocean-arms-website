@@ -90,10 +90,10 @@ export default function ContactPage() {
   return (
     <>
       {/* ── Split layout ── */}
-      <div className="flex flex-col lg:flex-row">
+      <div className="flex flex-col lg:flex-row pt-[80px]">
 
         {/* Left image panel — sticky on desktop */}
-        <div className="relative w-full h-[56vw] max-h-[420px] lg:max-h-none lg:h-[calc(100vh-65px)] lg:sticky lg:top-[65px] lg:w-[44%] shrink-0 overflow-hidden">
+        <div className="relative w-full h-[56vw] max-h-[420px] lg:max-h-none lg:h-[calc(100vh-80px)] lg:sticky lg:top-[80px] lg:w-[44%] shrink-0 overflow-hidden">
           <Image
             src="/assets/marine.jpg"
             alt="Ocean Arms marine and industrial operations"
@@ -177,7 +177,6 @@ export default function ContactPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55 }}
             >
-              <p className="section-eyebrow text-muted-foreground mb-3">Contact us</p>
               <h1 className="font-display text-4xl sm:text-5xl font-bold text-foreground tracking-tight leading-none mb-3">
                 Get in touch
               </h1>

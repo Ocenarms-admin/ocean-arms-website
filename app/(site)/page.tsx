@@ -1,575 +1,1656 @@
-"use client";
+'use client';
 
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "motion/react";
-import Link from "next/link";
-import Image from "next/image";
+import { useEffect, useRef, useState, useCallback } from 'react';
 
-function FadeUp({
-  children,
-  delay = 0,
-  className = "",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) {
+/* ─── Iconify custom-element type (React 19 uses React.JSX namespace) ─── */
+declare module 'react' {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace JSX {
+    interface IntrinsicElements {
+      'iconify-icon': React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement> & {
+          icon: string;
+          width?: string | number;
+          height?: string | number;
+        },
+        HTMLElement
+      >;
+    }
+  }
+}
+
+/* ─── Helpers ─── */
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
+
+const prefersHover = typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+/* ─── Global CSS ─── */
+function GlobalStyles() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
+    <style dangerouslySetInnerHTML={{
+      __html: `
+      /* ── Fonts fallback stack ── */
+      :root {
+        --font-serif: 'Inter', system-ui, sans-serif;
+        --font-sans: 'Inter', system-ui, sans-serif;
+        --font-display: 'Inter', system-ui, sans-serif;
+        --font-accent: 'Inter', system-ui, sans-serif;
+        --c-bg: #F7FBFF;
+        --c-fg: #3A5270;
+        --c-primary: #3580B1;
+        --c-muted: #80B8D8;
+        --c-deep: #0C2340;
+        --c-s100: #EBF4FA;
+        --c-s200: #C6DFF0;
+        --c-s300: #99C4E0;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body { background: var(--c-bg); color: var(--c-fg); overflow-x: hidden; }
+      #about, #services, #industries, #why-us, #pillars, #contact {
+        scroll-margin-top: 96px;
+      }
+
+      /* ── Keyframes ── */
+      @keyframes scrollMarquee {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+      }
+      @keyframes drawLine {
+        to { stroke-dashoffset: 0; }
+      }
+      @keyframes fadeInFill {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      @keyframes ctaBounce {
+        0% { opacity: 0; transform: translateY(40px) skewX(-3deg); }
+        55% { transform: translateY(-8px) skewX(-1deg); }
+        75% { transform: translateY(4px) skewX(0); }
+        100% { opacity: 1; transform: translateY(0) skewX(0); }
+      }
+      @keyframes pulseGlow {
+        0% { transform: scale(1.02); opacity: 0.65; }
+        100% { transform: scale(1.65); opacity: 0; }
+      }
+      @keyframes heroFloat {
+        0%, 100% { transform: translateY(0px) rotate(0.3deg); }
+        50% { transform: translateY(-14px) rotate(-0.3deg); }
+      }
+      @keyframes softRotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      @keyframes progressGrow {
+        from { height: 0%; }
+        to { height: 100%; }
+      }
+
+      /* ── Reusable animation classes ── */
+      .cta-bounce { opacity: 0; animation: ctaBounce 0.9s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+      .svg-float { animation: heroFloat 6s ease-in-out infinite; }
+      .pulse-glow { position: relative; }
+      .pulse-glow::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 9999px;
+        border: 2px solid rgba(53,128,177,0.55);
+        animation: pulseGlow 2.2s ease-out infinite;
+        pointer-events: none;
+      }
+
+      .draw-line {
+        stroke-dasharray: 1000;
+        stroke-dashoffset: 1000;
+        animation: drawLine 2.4s cubic-bezier(0.25,1,0.5,1) forwards;
+      }
+      .fade-fill {
+        opacity: 0;
+        animation: fadeInFill 1.2s ease forwards;
+      }
+
+      /* ── Marquee ── */
+      .marquee-track { display: flex; width: max-content; animation: scrollMarquee 28s linear infinite; }
+      .marquee-track:hover { animation-play-state: paused; }
+
+      /* ── Range input ── */
+      input[type=range] { -webkit-appearance: none; appearance: none; background: transparent; width: 100%; }
+      input[type=range]::-webkit-slider-runnable-track {
+        height: 6px; background: var(--c-s200); border-radius: 9999px;
+      }
+      input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+        background: var(--c-deep); border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.25); margin-top: -7px; cursor: pointer;
+      }
+      input[type=range]::-moz-range-track { height: 6px; background: var(--c-s200); border-radius: 9999px; }
+      input[type=range]::-moz-range-thumb {
+        width: 20px; height: 20px; border-radius: 50%; background: var(--c-deep);
+        border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.25); cursor: pointer;
+      }
+
+      /* ── 3D preserve ── */
+      .preserve-3d { transform-style: preserve-3d; }
+      .backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+
+      /* ── FAQ card flip ── */
+      .faq-card-inner { transition: transform 0.35s cubic-bezier(0.77,0,0.175,1); transform-style: preserve-3d; }
+      .faq-card-inner.flipped { transform: rotateY(180deg); }
+      .faq-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+      .faq-back { transform: rotateY(180deg); }
+
+      /* ── Milestone ── */
+      .ms-dot { transition: background 0.45s, transform 0.45s; }
+      .ms-content { overflow: hidden; max-height: 220px; opacity: 0; transition: opacity 0.4s; }
+      .ms-item { opacity: 0.35; transition: opacity 0.4s; }
+      .ms-item.active { opacity: 1; }
+      .ms-item.active .ms-dot { background: var(--c-deep) !important; transform: scale(1.35); }
+      .ms-item.active .ms-content { opacity: 1; }
+
+      /* ── Nav underline accent ── */
+      .logo-underline {
+        position: absolute; bottom: -3px; right: -6px;
+        width: 115%; height: 2.5px;
+        background: linear-gradient(90deg, var(--c-muted), var(--c-primary));
+        border-radius: 9999px; transform: rotate(-5deg);
+      }
+
+      /* ── Feature cards spread ── */
+      .feat-card { position: absolute; inset: 0; border-radius: 2rem; will-change: transform; transition: box-shadow 0.3s; }
+      .feat-card:hover { box-shadow: 0 32px 80px rgba(12,35,64,0.18) !important; }
+
+      /* ── Section reveal ── */
+      .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.8s cubic-bezier(0.25,1,0.5,1), transform 0.8s cubic-bezier(0.25,1,0.5,1); }
+      .reveal.visible { opacity: 1; transform: translateY(0); }
+
+      /* ── Scrollbar thin ── */
+      ::-webkit-scrollbar { width: 4px; }
+      ::-webkit-scrollbar-track { background: var(--c-s100); }
+      ::-webkit-scrollbar-thumb { background: var(--c-s300); border-radius: 9999px; }
+
+      /* ── Vision/Mission flip cards ── */
+      .vm-flip { perspective: 1200px; }
+      .vm-card {
+        position: relative; width: 100%; height: 100%;
+        transform-style: preserve-3d;
+        transition: transform 0.75s cubic-bezier(0.23, 1, 0.32, 1);
+        cursor: default;
+      }
+      @media (hover: hover) and (pointer: fine) {
+        .vm-flip:hover .vm-card { transform: rotateY(180deg); }
+      }
+      .vm-face {
+        position: absolute; inset: 0;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        border-radius: 2rem;
+        display: flex; flex-direction: column; align-items: center;
+        justify-content: center; text-align: center;
+        padding: 3.5rem;
+        gap: 1.5rem;
+      }
+      .vm-front {
+        align-items: stretch;
+        justify-content: flex-end;
+        text-align: left;
+        padding: 0;
+        gap: 0;
+      }
+      .vm-back { transform: rotateY(180deg); }
+      .vm-card.is-flipped { transform: rotateY(180deg); }
+
+      /* ── Mobile-only layout fixes (desktop unchanged) ── */
+      @media (max-width: 768px) {
+        .nt2-nav-inner { padding: 0 1rem !important; }
+        .nt2-nav-logo { height: 46px !important; }
+        .nt2-nav-links-text { display: none !important; }
+        .nt2-nav-cta { padding: 0.55rem 1rem !important; font-size: 0.62rem !important; }
+
+        .nt2-hero-inner { padding: 1rem 1rem 2rem !important; }
+        .nt2-hero-stats { gap: 1.25rem !important; flex-wrap: wrap !important; }
+
+        .nt2-services-section {
+          height: auto !important;
+        }
+        .nt2-services-sticky {
+          position: relative !important;
+          height: auto !important;
+          padding: 4.5rem 1rem 3rem !important;
+          justify-content: flex-start !important;
+          overflow: visible !important;
+        }
+        .nt2-services-grid {
+          grid-template-columns: 1fr !important;
+          gap: 1rem !important;
+          flex: none !important;
+          min-height: auto !important;
+        }
+        .nt2-service-row {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+        .nt2-services-grid .ms-item {
+          opacity: 1 !important;
+        }
+        .nt2-services-grid .ms-item .ms-dot {
+          background: var(--c-deep) !important;
+          transform: scale(1.25) !important;
+        }
+        .nt2-services-grid .ms-item .ms-content {
+          opacity: 1 !important;
+        }
+        .nt2-connector-fill {
+          transform: scaleY(1) !important;
+        }
+
+        .nt2-footer-grid {
+          grid-template-columns: 1fr 1fr !important;
+          gap: 2rem 1.25rem !important;
+        }
+        .nt2-footer-brand { grid-column: 1 / -1 !important; }
+        .nt2-footer-bottom { flex-direction: column !important; align-items: flex-start !important; gap: 0.85rem !important; }
+        .nt2-footer-legal { gap: 1rem !important; flex-wrap: wrap !important; }
+
+        .nt2-about-grid {
+          grid-template-columns: 1fr !important;
+          gap: 2.5rem !important;
+        }
+
+        .nt2-feat-section {
+          height: auto !important;
+        }
+        .nt2-feat-sticky {
+          position: relative !important;
+          height: auto !important;
+          padding: 4rem 1rem !important;
+          overflow: visible !important;
+        }
+        .nt2-feat-header { margin-bottom: 1.75rem !important; padding: 0 0.5rem !important; }
+        .nt2-feat-deck {
+          position: relative !important;
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 1rem !important;
+          width: 100% !important;
+          max-width: 420px !important;
+          height: auto !important;
+          perspective: none !important;
+        }
+        .nt2-feat-deck .feat-card {
+          position: relative !important;
+          inset: auto !important;
+          width: 100% !important;
+          height: auto !important;
+          min-height: 0 !important;
+          padding: 1.5rem !important;
+          transform: none !important;
+          box-shadow: 0 10px 28px rgba(53,128,177,0.18), 0 2px 8px rgba(12,35,64,0.06) !important;
+        }
+
+        .nt2-vm-row {
+          flex-direction: column !important;
+          align-items: center !important;
+          gap: 1.25rem !important;
+        }
+        .nt2-vm-flip {
+          width: min(340px, 100%) !important;
+          height: 460px !important;
+        }
+        .vm-face { padding: 2rem 1.5rem !important; }
+        .vm-front { padding: 0 !important; }
+
+        .nt2-industries-grid {
+          grid-template-columns: 1fr !important;
+          grid-template-rows: none !important;
+        }
+        .nt2-industries-featured {
+          grid-column: auto !important;
+          grid-row: auto !important;
+          min-height: 360px !important;
+        }
+
+        .nt2-why-grid { grid-template-columns: 1fr !important; }
+        .nt2-why-sub { grid-template-columns: 1fr !important; }
+
+        .nt2-cta-inner {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+        }
+
+        .nt2-section-pad {
+          padding-top: 4rem !important;
+          padding-bottom: 4rem !important;
+        }
+
+        .nt2-hero-title span {
+          font-size: clamp(2.4rem, 11vw, 3.4rem) !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .nt2-footer-grid { grid-template-columns: 1fr !important; }
+      }
+
+      /* ── Reduced motion ── */
+      @media (prefers-reduced-motion: reduce) {
+        .cta-bounce { animation: none !important; opacity: 1 !important; }
+        .marquee-track { animation: none !important; }
+        .pulse-glow::after { animation: none !important; }
+        .svg-float { animation: none !important; }
+        .reveal { transition: opacity 0.2s ease !important; transform: none !important; }
+        .faq-card-inner { transition: none !important; }
+        .ms-dot { transition: background 0.2s !important; }
+        .ms-content { transition: opacity 0.2s !important; }
+        .ms-item { transition: opacity 0.2s !important; }
+        .feat-card { transition: none !important; }
+        .vm-card { transition: none !important; }
+      }
+    `}} />
   );
 }
 
-function CheckIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 20 20" fill="currentColor">
-      <path
-        fillRule="evenodd"
-        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
+/* ═══════════════════════════════════════
+   REVEAL HOOK — IntersectionObserver
+═══════════════════════════════════════ */
+function useReveal(selector: string) {
+  useEffect(() => {
+    let obs: IntersectionObserver | null = null;
+    const timer = setTimeout(() => {
+      const els = document.querySelectorAll<HTMLElement>(selector);
+      // Immediately reveal elements already well into or above the viewport
+      els.forEach((el) => {
+        if (el.getBoundingClientRect().top < window.innerHeight * 0.95) {
+          el.classList.add('visible');
+        }
+      });
+      obs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) { e.target.classList.add('visible'); obs!.unobserve(e.target); }
+          });
+        },
+        { threshold: 0.05, rootMargin: '0px 0px -30px 0px' }
+      );
+      els.forEach((el) => { if (!el.classList.contains('visible')) obs!.observe(el); });
+    }, 80);
+    return () => { clearTimeout(timer); obs?.disconnect(); };
+  }, [selector]);
 }
 
-function ArrowRight({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 20 20" fill="currentColor">
-      <path
-        fillRule="evenodd"
-        d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-}
-
-function ShieldIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-    </svg>
-  );
-}
-
-function StarIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-    </svg>
-  );
-}
-
-function UsersIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-    </svg>
-  );
-}
-
-function ZapIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-    </svg>
-  );
-}
-
-const stats = [
-  { value: "24/7", label: "Emergency response" },
-  { value: "IRATA", label: "Certified technicians" },
-  { value: "4", label: "Core industries" },
-  { value: "Global", label: "Coverage" },
-];
-
-const coreValues = [
-  { Icon: ShieldIcon, label: "Safety First" },
-  { Icon: StarIcon, label: "Excellence" },
-  { Icon: UsersIcon, label: "Integrity" },
-  { Icon: ZapIcon, label: "Efficiency" },
-];
-
-const industries = [
-  {
-    title: "Oil & Gas",
-    href: "/industries/oil-and-gas",
-    image: "/assets/oil-gas.jpg",
-    description:
-      "Rope access inspection, maintenance, and support services for onshore and offshore oil and gas facilities throughout the GCC.",
-    icon: "⚙️",
-  },
-  {
-    title: "Marine & Shipping",
-    href: "/industries/marine-and-shipping",
-    image: "/assets/marine.jpg",
-    description:
-      "Ship repair support, vessel maintenance, hull cleaning, cargo hold cleaning, and specialist marine manpower across UAE ports.",
-    icon: "🚢",
-  },
-  {
-    title: "Power & Energy",
-    href: "/industries/power-and-energy",
-    image: "/assets/power.jpg",
-    description:
-      "Power plant maintenance, shutdown support, heat exchanger cleaning, and structural services for conventional and renewable energy.",
-    icon: "⚡",
-  },
-  {
-    title: "Civil & Construction",
-    href: "/industries/civil-and-construction",
-    image: "/assets/civil.jpg",
-    description:
-      "High-rise facade maintenance, building cleaning, structural repairs, and specialist access services for commercial and industrial projects.",
-    icon: "🏗️",
-  },
-];
-
-const ropeAccessServices = [
-  "Inspection & NDT",
-  "Blasting & Painting",
-  "Surface Preparation",
-  "Welding Repairs",
-  "Hydro Blasting",
-  "Insulation Works",
-  "Equipment Installation",
-  "Building Maintenance",
-];
-
-const whyChoosePoints = [
-  "IRATA-certified rope access technicians",
-  "Full HSSE compliance on every job",
-  "24/7 emergency response capability",
-  "Single-source multidisciplinary team",
-  "Fully equipped with latest tooling",
-  "Proven track record across GCC",
-  "Competitive pricing with quality assurance",
-  "Rapid mobilization and deployment",
-  "Experienced project management",
-];
-
-const clientSectors = [
-  "ADNOC Group",
-  "Dubai Petroleum",
-  "Drydocks World",
-  "DP World",
-  "DEWA",
-  "Gulf Navigation",
-  "Major EPC Contractors",
-  "Offshore Operators",
-];
-
-const missionPoints = [
-  "Deliver safe, compliant, and high-quality services on every engagement",
-  "Build long-term partnerships through reliability and technical excellence",
-  "Continuously invest in our people and equipment to stay ahead of industry demands",
-  "Operate with integrity and transparency in all client relationships",
-];
-
-export default function HomePage() {
-  const heroRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-  const heroImgY = useTransform(scrollYProgress, [0, 1], [0, 80]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
+/* ═══════════════════════════════════════
+   1. NAVBAR
+═══════════════════════════════════════ */
+function Navbar() {
+  const [pastHero, setPastHero] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setPastHero(window.scrollY > window.innerHeight - 80);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <>
-      {/* ── HERO ─────────────────────────────────────────── */}
-      <section ref={heroRef} className="relative isolate overflow-hidden bg-navy pt-[65px]">
-        <motion.div className="absolute inset-0" style={{ y: heroImgY }}>
-          <Image
-            src="/assets/hero-ship.jpg"
-            alt="Industrial marine vessel"
-            fill
-            className="object-cover opacity-45"
-            priority
+    <nav style={{
+      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+      height: 80, display: 'flex', alignItems: 'center',
+      background: pastHero ? '#EBF4FA' : 'transparent',
+      transition: 'background 0.4s ease',
+      boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
+    }}>
+      <div className="nt2-nav-inner" style={{ maxWidth: 1280, margin: '0 auto', width: '100%', padding: '0 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* Logo */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <a href="#" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+          <img
+            className="nt2-nav-logo"
+            src={pastHero ? '/assets/o-a-logo-bg-rmd%20(1).png' : '/assets/o-a-logo-bg-light.png'}
+            alt="Ocean Arms Technical Services"
+            style={{ height: 62, width: 'auto', objectFit: 'contain', transition: 'opacity 0.3s ease' }}
           />
-        </motion.div>
-        <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/85 to-navy/35" />
+        </a>
 
-        <motion.div
-          className="relative mx-auto max-w-6xl px-5 py-24 sm:py-32 lg:py-40"
-          style={{ opacity: heroOpacity }}
-        >
-          <motion.p
-            className="section-eyebrow text-sky"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
-          >
-            Dubai, United Arab Emirates
-          </motion.p>
-
-          <motion.h1
-            className="mt-5 max-w-3xl font-display text-4xl font-bold uppercase leading-[1.05] text-navy-foreground sm:text-6xl lg:text-7xl"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-          >
-            Marine &amp; Industrial Technical Solutions
-          </motion.h1>
-
-          <motion.p
-            className="mt-6 max-w-xl text-base text-navy-foreground/80 sm:text-lg"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.4 }}
-          >
-            Ocean Arms Technical Services LLC is a UAE-based industrial services company delivering
-            integrated technical solutions across Oil &amp; Gas, Marine, Power, and Civil sectors
-            throughout the GCC region.
-          </motion.p>
-
-          <motion.div
-            className="mt-9 flex flex-wrap gap-3"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.55 }}
-          >
-            <Link
-              href="/contact"
-              className="inline-flex items-center gap-2 bg-primary px-7 py-3.5 text-sm font-semibold uppercase tracking-wide text-primary-foreground hover:opacity-90 transition-opacity"
-            >
-              Request a quotation
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <a
-              href="#industries"
-              className="inline-flex items-center gap-2 border border-navy-foreground/35 px-7 py-3.5 text-sm font-semibold uppercase tracking-wide text-navy-foreground hover:bg-navy-foreground/10 transition-colors"
-            >
-              Industries we serve
+        {/* Links */}
+        <div style={{ display: 'flex', gap: '2.2rem', alignItems: 'center' }}>
+          {[
+            ['About', '#about'],
+            ['Industries', '#industries'],
+            ['Rope Access Service', '#services'],
+            ['Services', '#why-us'],
+          ].map(([label, href]) => (
+            <a key={label} href={href} className="nt2-nav-links-text" style={{
+              fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.7rem',
+              letterSpacing: '0.14em', textTransform: 'uppercase',
+              color: pastHero ? 'var(--c-fg)' : 'rgba(247,251,255,0.95)', textDecoration: 'none',
+              transition: 'color 0.2s',
+            }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = pastHero ? 'var(--c-deep)' : '#F7FBFF')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = pastHero ? 'var(--c-fg)' : 'rgba(247,251,255,0.95)')}>
+              {label}
             </a>
-          </motion.div>
-
-          {/* Stats */}
-          <motion.dl
-            className="mt-16 grid max-w-2xl grid-cols-2 gap-x-6 gap-y-8 border-t border-navy-foreground/15 pt-8 sm:grid-cols-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.7 }}
-          >
-            {stats.map((stat, i) => (
-              <motion.div
-                key={stat.value}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.75 + i * 0.08 }}
-              >
-                <dt className="font-display text-3xl font-bold text-sky">{stat.value}</dt>
-                <dd className="mt-1 text-xs uppercase tracking-[0.18em] text-navy-foreground/60">
-                  {stat.label}
-                </dd>
-              </motion.div>
-            ))}
-          </motion.dl>
-        </motion.div>
-      </section>
-
-      {/* ── ABOUT ─────────────────────────────────────────── */}
-      <section id="about" className="scroll-mt-24 bg-background py-20 sm:py-28">
-        <div className="mx-auto grid max-w-6xl gap-12 px-5 lg:grid-cols-[0.9fr_1.1fr]">
-          <FadeUp>
-            <p className="section-eyebrow text-primary">About Us</p>
-            <h2 className="mt-4 font-display text-3xl font-bold uppercase leading-tight text-navy sm:text-5xl">
-              A trusted industrial services partner in the UAE
-            </h2>
-          </FadeUp>
-          <FadeUp delay={0.15}>
-            <div className="space-y-5 text-base leading-relaxed text-muted-foreground">
-              <p>
-                Ocean Arms Technical Services LLC is a UAE-registered company providing specialized
-                industrial and marine technical services to clients across the Oil &amp; Gas, Marine &amp;
-                Shipping, Power &amp; Energy, and Civil &amp; Construction sectors.
-              </p>
-              <p>
-                With a highly skilled workforce of IRATA-certified rope access technicians, industrial
-                painters, blasters, and marine maintenance specialists, we are equipped to handle
-                complex scopes in some of the most challenging environments in the region.
-              </p>
-              <p className="border-l-2 border-primary pl-5 text-foreground">
-                Our teams operate 24/7, with rapid mobilization capability across UAE and the broader
-                GCC region — ensuring our clients&apos; assets remain operational, compliant, and
-                well-maintained at all times.
-              </p>
-            </div>
-          </FadeUp>
+          ))}
+          <a href="/contact" className="nt2-nav-cta" style={{
+            fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.7rem',
+            letterSpacing: '0.1em', textTransform: 'uppercase',
+            background: pastHero ? 'var(--c-deep)' : 'rgba(255,255,255,0.15)', color: 'white',
+            border: pastHero ? 'none' : '1px solid rgba(255,255,255,0.3)',
+            borderRadius: 9999, padding: '0.75rem 1.75rem',
+            cursor: 'pointer', transition: 'background 0.2s, transform 0.15s',
+            textDecoration: 'none', display: 'inline-flex', alignItems: 'center',
+          }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--c-primary)'; if (prefersHover) e.currentTarget.style.transform = 'scale(1.03)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = pastHero ? 'var(--c-deep)' : 'rgba(255,255,255,0.15)'; e.currentTarget.style.transform = 'scale(1)'; }}>
+            Request a Quote
+          </a>
         </div>
-      </section>
+      </div>
+    </nav>
+  );
+}
 
-      {/* ── VISION / MISSION ─────────────────────────────── */}
-      <section className="bg-sky-soft py-20 sm:py-24">
-        <div className="mx-auto grid max-w-6xl gap-6 px-5 md:grid-cols-2">
-          <FadeUp>
-            <div className="bg-card p-8 shadow-panel sm:p-10 h-full">
-              <p className="section-eyebrow text-primary">Vision</p>
-              <h3 className="mt-4 font-display text-2xl font-bold uppercase text-navy">
-                To be the leading technical services provider in the UAE marine and industrial sector
+/* ═══════════════════════════════════════
+   2. HERO
+═══════════════════════════════════════ */
+const heroSlides = [
+  { src: '/assets/new-hr-3.png',  industry: 'Marine & Shipping' },
+  { src: '/assets/oil-gas.jpg',   industry: 'Oil & Gas' },
+  { src: '/assets/power.jpg',     industry: 'Power & Energy' },
+  { src: '/assets/civil.jpg',     industry: 'Civil & Construction' },
+];
+
+function Hero() {
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setActive((prev) => (prev + 1) % heroSlides.length);
+    }, 3000);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <section style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center',
+      paddingTop: 80, position: 'relative', overflow: 'hidden',
+    }}>
+      {/* ── Crossfading background images ── */}
+      {heroSlides.map((slide, i) => (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          key={slide.src}
+          src={slide.src}
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: 'absolute', inset: 0,
+            width: '100%', height: '100%',
+            objectFit: 'cover', objectPosition: 'center',
+            zIndex: 0,
+            opacity: i === active ? 1 : 0,
+            transition: 'opacity 1.2s ease-in-out',
+          }}
+        />
+      ))}
+
+      {/* ── Dark overlay for text contrast ── */}
+      <div style={{
+        position: 'absolute', inset: 0, zIndex: 1,
+        background: 'rgba(12,35,64,0.52)',
+      }} />
+
+      {/* ── Slide indicator dots ── */}
+      <div style={{
+        position: 'absolute', bottom: '2rem', left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex', gap: '0.5rem', zIndex: 4,
+      }}>
+        {heroSlides.map((slide, i) => (
+          <button
+            key={slide.industry}
+            aria-label={`Show ${slide.industry}`}
+            onClick={() => setActive(i)}
+            style={{
+              width: i === active ? 28 : 8,
+              height: 8, borderRadius: 9999, border: 'none',
+              background: i === active ? '#80B8D8' : 'rgba(255,255,255,0.35)',
+              cursor: 'pointer', padding: 0,
+              transition: 'width 0.4s ease, background 0.4s ease',
+            }}
+          />
+        ))}
+      </div>
+
+
+
+      {/* ── Content ── */}
+      <div className="nt2-hero-inner" style={{
+        maxWidth: 1280, margin: '0 auto', width: '100%',
+        padding: '1.5rem 1.5rem', position: 'relative', zIndex: 3,
+      }}>
+        <div style={{ maxWidth: 660 }}>
+          {/* Headline */}
+          <h1 className="nt2-hero-title" style={{ margin: 0, lineHeight: 1.06 }}>
+            {[['Marine &', '0.05s', false], ['Industrial', '0.22s', false], ['Solutions.', '0.4s', true]].map(([text, delay, italic]) => (
+              <span key={text as string} className="cta-bounce" style={{
+                display: 'block',
+                fontFamily: 'var(--font-serif)',
+                fontSize: 'clamp(3.2rem, 6.5vw, 5.2rem)',
+                fontWeight: italic ? 400 : 500,
+                fontStyle: 'normal',
+                color: italic ? '#80B8D8' : '#F7FBFF',
+                animationDelay: delay as string,
+              }}>
+                {text as string}
+              </span>
+            ))}
+          </h1>
+
+          {/* Description */}
+          <p className="cta-bounce" style={{
+            fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '1.05rem', lineHeight: 1.75,
+            color: 'rgba(247,251,255,0.72)', maxWidth: 480, marginTop: '1rem', animationDelay: '0.58s',
+          }}>
+            Ocean Arms Technical Services LLC delivers integrated technical solutions across
+            Oil & Gas, Marine, Power, and Civil sectors throughout the GCC region.
+          </p>
+
+          {/* CTAs */}
+          <div className="cta-bounce" style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap', animationDelay: '0.72s' }}>
+            <button className="pulse-glow" style={{
+              fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem',
+              letterSpacing: '0.1em', textTransform: 'uppercase',
+              background: 'var(--c-primary)', color: 'white',
+              border: 'none', borderRadius: 9999, padding: '1rem 2.25rem',
+              cursor: 'pointer', boxShadow: '0 8px 36px rgba(53,128,177,0.45)',
+              transition: 'transform 0.2s', display: 'flex', alignItems: 'center', gap: 8,
+            }}
+              onMouseEnter={(e) => { if (prefersHover) e.currentTarget.style.transform = 'scale(1.04)'; }}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}>
+              <iconify-icon icon="solar:document-text-linear" width="16" />
+              Request a Quotation
+            </button>
+            <button style={{
+              fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.72rem',
+              letterSpacing: '0.1em', textTransform: 'uppercase',
+              background: 'rgba(255,255,255,0.08)', color: 'rgba(247,251,255,0.88)',
+              border: '1px solid rgba(255,255,255,0.22)', borderRadius: 9999, padding: '1rem 2.25rem',
+              cursor: 'pointer', transition: 'border-color 0.2s, background 0.2s, transform 0.2s',
+              backdropFilter: 'blur(8px)',
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(128,184,216,0.6)'; e.currentTarget.style.background = 'rgba(255,255,255,0.14)'; if (prefersHover) e.currentTarget.style.transform = 'scale(1.04)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.22)'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.transform = 'scale(1)'; }}>
+              <iconify-icon icon="solar:buildings-linear" width="16" />
+              Industries We Serve
+            </button>
+          </div>
+
+          {/* Stats row */}
+          <div className="nt2-hero-stats" style={{ display: 'flex', gap: '2.5rem', marginTop: '1.75rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.15)' }}>
+            {[['24/7', 'Emergency Response'], ['5', 'Core Industries'], ['Global', 'Coverage']].map(([num, label]) => (
+              <div key={label} style={{ textAlign: 'center' }}>
+                <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.7rem', fontWeight: 600, color: '#F7FBFF' }}>{num}</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.6rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(198,223,240,0.8)', marginTop: 3 }}>{label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+    </section>
+  );
+}
+
+
+/* ═══════════════════════════════════════
+   6. ROPE ACCESS SERVICES — Scroll-Scrubbed
+═══════════════════════════════════════ */
+const ROPE_SERVICES = [
+  { name: 'Inspection & NDT',         desc: 'Visual, UT, MPI, and DPT testing on structures at height.',   icon: 'solar:eye-scan-linear' },
+  { name: 'Blasting & Painting',      desc: 'Surface preparation and protective coating systems.',           icon: 'solar:paint-roller-linear' },
+  { name: 'Surface Preparation',      desc: 'SSPC/NACE standard abrasive and hydro-blasting.',              icon: 'solar:waterdrops-linear' },
+  { name: 'Welding Repairs',          desc: 'On-site structural and pipeline weld repairs at any height.',  icon: 'solar:fire-linear' },
+  { name: 'Hydro Blasting',           desc: 'High-pressure water jetting for fouling and scale removal.',   icon: 'solar:waterdrop-linear' },
+  { name: 'Insulation Works',         desc: 'Pipe and equipment insulation installation and replacement.',  icon: 'solar:layers-minimalistic-linear' },
+  { name: 'Equipment Installation',   desc: 'Rigging, lifting, and positioning of industrial equipment.',   icon: 'solar:settings-linear' },
+  { name: 'Building Maintenance',     desc: 'Facade, sealant, and structure maintenance at elevation.',     icon: 'solar:buildings-linear' },
+];
+
+const PROJECT_STAGES = [
+  { label: 'Site Survey',       desc: 'Risk assessment, method statement, and permit-to-work.',  icon: 'solar:map-point-linear' },
+  { label: 'Mobilisation',     desc: 'Equipment pre-checks, PPE issuance, and team briefing.',  icon: 'solar:box-linear' },
+  { label: 'Execution',        desc: 'Supervised rope access operations with daily toolbox talks.', icon: 'solar:dumbbell-linear' },
+  { label: 'QA / Inspection',  desc: 'Client sign-off, photographic evidence, NDT records.',    icon: 'solar:diploma-linear' },
+  { label: 'Demobilisation',   desc: 'Site reinstatement and close-out report delivered.',      icon: 'solar:check-circle-linear' },
+];
+
+function Payment() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const serviceRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const stageRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const connectorRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const rafRef = useRef<number>(0);
+
+  const animate = useCallback(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+
+    // Mobile: content stays static — no scroll scrubbing
+    if (window.innerWidth <= 768) return;
+
+    const rect = section.getBoundingClientRect();
+    const scrollable = section.offsetHeight - window.innerHeight;
+    const raw = Math.max(0, Math.min(1, -rect.top / scrollable));
+
+    // Service rows slide in at 0–0.55 progress
+    serviceRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const threshold = (i + 1) / (ROPE_SERVICES.length + 1) * 0.55;
+      const visible = raw > threshold;
+      el.style.opacity = visible ? '1' : '0';
+      el.style.transform = visible ? 'translateX(0)' : 'translateX(-28px)';
+    });
+
+    // Project stages activate
+    const stageThresholds = [0.22, 0.38, 0.55, 0.70, 0.86];
+    stageRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const active = raw > stageThresholds[i];
+      el.classList.toggle('ms-item', true);
+      el.classList.toggle('active', active);
+    });
+
+    // Connector lines between stages fill proportionally between thresholds
+    connectorRefs.current.forEach((el, i) => {
+      if (!el) return;
+      const start = stageThresholds[i];
+      const end = stageThresholds[i + 1];
+      const fill = Math.max(0, Math.min(1, (raw - start) / (end - start)));
+      el.style.transform = `scaleY(${fill})`;
+    });
+
+    rafRef.current = requestAnimationFrame(animate);
+  }, []);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          rafRef.current = requestAnimationFrame(animate);
+        } else {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = 0;
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(section);
+    return () => { observer.disconnect(); cancelAnimationFrame(rafRef.current); };
+  }, [animate]);
+
+  return (
+    <section id="services" ref={sectionRef} className="nt2-services-section" style={{ height: '350vh', position: 'relative' }}>
+      <div className="nt2-services-sticky" style={{
+        position: 'sticky', top: 0, height: '100vh',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        overflow: 'hidden',
+        padding: '5rem 2rem 1.5rem',
+        gap: '1.5rem',
+      }}>
+        {/* Rope access background */}
+        <div aria-hidden="true" style={{
+          position: 'absolute', inset: 0, zIndex: 0,
+          backgroundImage: 'url(/assets/rope-access-section-bg.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 30%',
+        }} />
+        <div aria-hidden="true" style={{
+          position: 'absolute', inset: 0, zIndex: 0,
+          background: 'linear-gradient(180deg, rgba(247,251,255,0.48) 0%, rgba(235,244,250,0.32) 45%, rgba(247,251,255,0.52) 100%)',
+        }} />
+
+        {/* Section header — stacked editorial with soft scrim */}
+        <div style={{
+          position: 'relative', zIndex: 1, flexShrink: 0,
+          marginTop: '1.25rem', width: '100%', maxWidth: 1100,
+          display: 'flex', justifyContent: 'center',
+        }}>
+          <div style={{
+            position: 'relative', padding: '1rem 1.5rem 1.1rem',
+            textAlign: 'center',
+          }}>
+            <div aria-hidden="true" style={{
+              position: 'absolute',
+              inset: '-0.2rem -0.75rem -0.4rem',
+              background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.55) 0%, rgba(247,251,255,0.28) 42%, rgba(247,251,255,0) 70%)',
+              filter: 'blur(1.5px)',
+              pointerEvents: 'none',
+            }} />
+            <p style={{
+              position: 'relative', zIndex: 1, margin: '0 0 0.45rem',
+              fontFamily: 'var(--font-display)', fontWeight: 600,
+              fontSize: '0.68rem', letterSpacing: '0.2em', textTransform: 'uppercase',
+              color: 'var(--c-deep)',
+            }}>
+              What We Do at Height
+            </p>
+            <h2 style={{
+              position: 'relative', zIndex: 1, margin: 0,
+              fontFamily: 'var(--font-serif)', fontWeight: 600,
+              fontSize: 'clamp(1.75rem, 3.6vw, 2.75rem)',
+              color: 'var(--c-deep)', lineHeight: 1.15, letterSpacing: '-0.02em',
+              textShadow: '0 1px 0 rgba(255,255,255,0.5)',
+            }}>
+              Rope Access Services
+            </h2>
+            <div aria-hidden="true" style={{
+              position: 'relative', zIndex: 1,
+              width: 64, height: 3, margin: '0.85rem auto 0', borderRadius: 9999,
+              background: 'linear-gradient(90deg, rgba(53,128,177,0.15), var(--c-primary), rgba(53,128,177,0.15))',
+            }} />
+          </div>
+        </div>
+
+        <div className="nt2-services-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', maxWidth: 1100, width: '100%', alignItems: 'stretch', flex: 1, minHeight: 0, position: 'relative', zIndex: 1 }}>
+          {/* Left: services card */}
+          <div style={{ background: 'white', borderRadius: '1.5rem', padding: '1.5rem', boxShadow: '0 16px 60px rgba(12,35,64,0.1)', border: '1px solid var(--c-s200)', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', flexShrink: 0 }}>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: '1.05rem', color: 'var(--c-deep)', margin: 0 }}>
+                Service Capabilities
               </h3>
-              <p className="mt-4 text-muted-foreground">
-                We aspire to build a reputation for excellence, reliability, and safety — becoming
-                the partner of choice for asset owners and operators across the GCC and beyond.
-              </p>
+              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase', background: 'var(--c-s100)', color: 'var(--c-fg)', padding: '0.3rem 0.7rem', borderRadius: 9999 }}>
+                {ROPE_SERVICES.length} Services
+              </span>
             </div>
-          </FadeUp>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              {ROPE_SERVICES.map((svc, i) => (
+                <div key={i} ref={(el) => { serviceRefs.current[i] = el; }} className="nt2-service-row" style={{
+                  display: 'flex', alignItems: 'center', gap: '0.75rem',
+                  borderBottom: i < ROPE_SERVICES.length - 1 ? '1px solid var(--c-s200)' : 'none',
+                  paddingBottom: i < ROPE_SERVICES.length - 1 ? '0.5rem' : 0,
+                  opacity: 0, transform: 'translateX(-28px)',
+                  transition: 'opacity 0.5s, transform 0.5s',
+                  transitionDelay: `${i * 0.06}s`,
+                }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--c-s100)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <iconify-icon icon={svc.icon} width="15" style={{ color: 'var(--c-primary)' }} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 500, fontSize: '0.8rem', color: 'var(--c-deep)' }}>{svc.name}</div>
+                    <div style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.72rem', lineHeight: 1.4, color: 'var(--c-muted)' }}>{svc.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-          <FadeUp delay={0.1}>
-            <div className="bg-navy p-8 text-navy-foreground shadow-panel sm:p-10 h-full">
-              <p className="section-eyebrow text-sky">Mission</p>
-              <ul className="mt-5 space-y-3.5">
-                {missionPoints.map((point) => (
-                  <li key={point} className="flex gap-3 text-sm text-navy-foreground/85">
-                    <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-sky" />
-                    {point}
+          {/* Right: Project stages */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* Project stages */}
+            <div style={{ background: 'white', borderRadius: '1.5rem', padding: '1.25rem', boxShadow: '0 12px 40px rgba(12,35,64,0.08)', border: '1px solid var(--c-s200)', flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontWeight: 500, fontSize: '1rem', color: 'var(--c-deep)', margin: '0 0 1rem' }}>
+                Project Workflow
+              </h3>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {PROJECT_STAGES.map((stage, i) => (
+                  <div key={i} ref={(el) => { stageRefs.current[i] = el; }} className="ms-item" style={{ display: 'flex', gap: '0.75rem', flex: i < PROJECT_STAGES.length - 1 ? 1 : 0 }}>
+                    {/* Left: dot + connector column */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 12, flexShrink: 0 }}>
+                      <div className="ms-dot" style={{ width: 12, height: 12, borderRadius: '50%', background: 'var(--c-s300)', flexShrink: 0, marginTop: 2, border: '2px solid white', boxShadow: '0 0 0 2px var(--c-s200)' }} />
+                      {i < PROJECT_STAGES.length - 1 && (
+                        <div style={{ flex: 1, width: 2, background: 'var(--c-s200)', borderRadius: 9999, marginTop: 4, marginBottom: 4, position: 'relative' }}>
+                          <div ref={(el) => { connectorRefs.current[i] = el; }} className="nt2-connector-fill" style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '100%', background: 'var(--c-deep)', borderRadius: 9999, transform: 'scaleY(0)', transformOrigin: 'top' }} />
+                        </div>
+                      )}
+                    </div>
+                    {/* Right: content */}
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 1 }}>
+                        <iconify-icon icon={stage.icon} width="12" style={{ color: 'var(--c-primary)' }} />
+                        <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--c-fg)' }}>{stage.label}</span>
+                      </div>
+                      <div className="ms-content">
+                        <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.76rem', lineHeight: 1.5, color: 'var(--c-fg)', margin: '0.3rem 0 0' }}>{stage.desc}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════
+   8. FOOTER
+═══════════════════════════════════════ */
+function Footer() {
+  return (
+    <footer style={{ background: 'var(--c-deep)', color: '#FAFAFA', padding: '5rem 0 3rem' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
+        {/* Top */}
+        <div className="nt2-footer-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '3rem', paddingBottom: '4rem', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+          {/* Brand */}
+          <div className="nt2-footer-brand">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/assets/o-a-logo-bg-light.png"
+              alt="Ocean Arms Technical Services"
+              style={{ height: 68, width: 'auto', objectFit: 'contain', marginBottom: '1.25rem', display: 'block' }}
+            />
+            <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.88rem', lineHeight: 1.7, color: 'rgba(250,250,250,0.6)', maxWidth: 280, margin: '0 0 1.75rem' }}>
+              UAE-based integrated technical services for Oil & Gas, Marine, Power, and Civil sectors across the GCC region.
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              {[
+                {
+                  label: 'Instagram',
+                  href: '#',
+                  path: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z',
+                },
+                {
+                  label: 'Facebook',
+                  href: '#',
+                  path: 'M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z',
+                },
+                {
+                  label: 'LinkedIn',
+                  href: '#',
+                  path: 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z',
+                },
+                {
+                  label: 'X',
+                  href: '#',
+                  path: 'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.717-8.819L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z',
+                },
+              ].map(({ label, href, path }) => (
+                <a key={label} href={href} aria-label={label} style={{
+                  width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.12)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none',
+                  transition: 'border-color 0.2s, background 0.2s, color 0.2s',
+                  color: 'rgba(250,250,250,0.65)',
+                }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--c-muted)'; e.currentTarget.style.background = 'rgba(128,184,216,0.1)'; e.currentTarget.style.color = '#FAFAFA'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(250,250,250,0.65)'; }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d={path} />
+                  </svg>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Links */}
+          {[
+            ['Services', ['Rope Access', 'Inspection & NDT', 'Blasting & Painting', 'Welding Repairs']],
+            ['Industries', ['Oil & Gas', 'Marine & Shipping', 'Power & Energy', 'Civil & Construction', 'Ship Designing']],
+            ['Company', ['About Us', 'Certifications', 'FAQ', 'Contact Us']],
+          ].map(([heading, links]) => (
+            <div key={heading as string}>
+              <h4 style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.65rem', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--c-muted)', margin: '0 0 1.5rem' }}>
+                {heading as string}
+              </h4>
+              <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {(links as string[]).map((link) => (
+                  <li key={link}>
+                    <a href="#" style={{
+                      fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.88rem',
+                      color: 'rgba(250,250,250,0.6)', textDecoration: 'none', transition: 'color 0.2s',
+                    }}
+                      onMouseEnter={(e) => (e.currentTarget.style.color = '#FAFAFA')}
+                      onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(250,250,250,0.6)')}>
+                      {link}
+                    </a>
                   </li>
                 ))}
               </ul>
             </div>
-          </FadeUp>
+          ))}
         </div>
-      </section>
 
-      {/* ── CORE VALUES ───────────────────────────────────── */}
-      <section className="bg-background py-20 sm:py-24">
-        <div className="mx-auto max-w-6xl px-5">
-          <FadeUp>
-            <p className="section-eyebrow text-primary">Core Values</p>
-            <h2 className="mt-4 max-w-2xl font-display text-3xl font-bold uppercase text-navy sm:text-4xl">
-              The principles behind every scope we deliver
-            </h2>
-          </FadeUp>
-
-          <motion.div
-            className="mt-10 grid grid-cols-2 gap-px overflow-hidden border border-border bg-border sm:grid-cols-4"
-            variants={{
-              hidden: {},
-              show: { transition: { staggerChildren: 0.08 } },
-            }}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-          >
-            {coreValues.map(({ Icon, label }) => (
-              <motion.div
-                key={label}
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-                }}
-                className="flex flex-col items-start gap-3 bg-card p-6"
-              >
-                <Icon className="h-6 w-6 text-primary" />
-                <span className="font-display text-base font-semibold uppercase tracking-wide text-navy">
-                  {label}
-                </span>
-              </motion.div>
+        {/* Bottom */}
+        <div className="nt2-footer-bottom" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.8rem', color: 'rgba(250,250,250,0.35)', margin: 0 }}>
+            © 2026 Ocean Arms Technical Services LLC. All rights reserved. Dubai, UAE.
+          </p>
+          <div className="nt2-footer-legal" style={{ display: 'flex', gap: '2rem' }}>
+            {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((link) => (
+              <a key={link} href="#" style={{
+                fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.78rem',
+                color: 'rgba(250,250,250,0.35)', textDecoration: 'none', transition: 'color 0.2s',
+              }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(250,250,250,0.6)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(250,250,250,0.35)')}>
+                {link}
+              </a>
             ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── INDUSTRIES ─────────────────────────────────────── */}
-      <section id="industries" className="scroll-mt-20 bg-sky-soft py-20 sm:py-28">
-        <div className="mx-auto max-w-6xl px-5">
-          <FadeUp>
-            <p className="section-eyebrow text-primary">Industries We Serve</p>
-            <h2 className="mt-4 max-w-2xl font-display text-3xl font-bold uppercase text-navy sm:text-5xl">
-              Four sectors. One multidisciplinary team.
-            </h2>
-          </FadeUp>
-
-          <motion.div
-            className="mt-12 grid gap-6 md:grid-cols-2"
-            variants={{
-              hidden: {},
-              show: { transition: { staggerChildren: 0.1 } },
-            }}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: "-60px" }}
-          >
-            {industries.map((ind) => (
-              <motion.div
-                key={ind.href}
-                variants={{
-                  hidden: { opacity: 0, y: 30 },
-                  show: {
-                    opacity: 1,
-                    y: 0,
-                    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] },
-                  },
-                }}
-              >
-                <Link
-                  href={ind.href}
-                  className="group flex flex-col overflow-hidden bg-card shadow-panel transition-shadow hover:shadow-lift"
-                >
-                  <div className="relative h-52 overflow-hidden">
-                    <Image
-                      src={ind.image}
-                      alt={ind.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <span className="absolute left-0 top-0 grid h-12 w-12 place-items-center bg-navy text-navy-foreground text-xl">
-                      {ind.icon}
-                    </span>
-                  </div>
-                  <div className="flex flex-1 flex-col p-7">
-                    <h3 className="font-display text-2xl font-bold uppercase text-navy">
-                      {ind.title}
-                    </h3>
-                    <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
-                      {ind.description}
-                    </p>
-                    <span className="mt-6 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                      View services
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </span>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── ROPE ACCESS ────────────────────────────────────── */}
-      <section id="rope-access" className="scroll-mt-20 bg-navy py-20 text-navy-foreground sm:py-28">
-        <div className="mx-auto grid max-w-6xl gap-12 px-5 lg:grid-cols-2">
-          <FadeUp>
-            <p className="section-eyebrow text-sky">Specialist Capability</p>
-            <h2 className="mt-4 font-display text-3xl font-bold uppercase leading-tight sm:text-5xl">
-              Rope Access Services
-            </h2>
-            <p className="mt-6 max-w-md text-navy-foreground/80">
-              Our IRATA-certified rope access teams provide safe, efficient, and cost-effective access
-              solutions for inspection, maintenance, and repair work at height and in confined spaces
-              — across all sectors we serve.
-            </p>
-            <Link
-              href="/contact"
-              className="mt-8 inline-flex items-center gap-2 bg-sky px-7 py-3.5 text-sm font-semibold uppercase tracking-wide text-navy hover:opacity-90 transition-opacity"
-            >
-              Discuss your scope
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </FadeUp>
-
-          <FadeUp delay={0.1}>
-            <ul className="grid gap-px self-start bg-navy-foreground/15 sm:grid-cols-2">
-              {ropeAccessServices.map((service) => (
-                <li key={service} className="bg-navy px-5 py-4 text-sm text-navy-foreground/85">
-                  {service}
-                </li>
-              ))}
-            </ul>
-          </FadeUp>
-        </div>
-      </section>
-
-      {/* ── WHY CHOOSE ─────────────────────────────────────── */}
-      <section id="why-us" className="scroll-mt-20 bg-background py-20 sm:py-28">
-        <div className="mx-auto max-w-6xl px-5">
-          <FadeUp>
-            <p className="section-eyebrow text-primary">Why Choose Us</p>
-            <h2 className="mt-4 max-w-2xl font-display text-3xl font-bold uppercase text-navy sm:text-5xl">
-              Strength across every discipline
-            </h2>
-          </FadeUp>
-
-          <motion.ul
-            className="mt-10 grid gap-x-10 gap-y-4 sm:grid-cols-2 lg:grid-cols-3"
-            variants={{
-              hidden: {},
-              show: { transition: { staggerChildren: 0.06 } },
-            }}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-          >
-            {whyChoosePoints.map((point) => (
-              <motion.li
-                key={point}
-                variants={{
-                  hidden: { opacity: 0, x: -10 },
-                  show: { opacity: 1, x: 0, transition: { duration: 0.5 } },
-                }}
-                className="flex items-start gap-3 border-b border-border pb-4 text-sm text-foreground/85"
-              >
-                <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                {point}
-              </motion.li>
-            ))}
-          </motion.ul>
-
-          <div className="mt-16 grid gap-6 md:grid-cols-2">
-            <FadeUp>
-              <div className="bg-sky-soft p-8">
-                <h3 className="font-display text-xl font-bold uppercase text-navy">
-                  Quality Assurance
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  All works carried out under strict HSSE guidelines with documented quality control
-                  processes, third-party inspection support, and full compliance with international
-                  standards.
-                </p>
-              </div>
-            </FadeUp>
-            <FadeUp delay={0.1}>
-              <div className="bg-sky-soft p-8">
-                <h3 className="font-display text-xl font-bold uppercase text-navy">
-                  Client Sectors
-                </h3>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {clientSectors.map((sector) => (
-                    <span key={sector} className="bg-card px-3 py-1.5 text-xs text-foreground/80">
-                      {sector}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </FadeUp>
           </div>
         </div>
-      </section>
+      </div>
+    </footer>
+  );
+}
 
-      {/* ── CTA ─────────────────────────────────────────────── */}
-      <section className="bg-primary py-16 text-primary-foreground">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6 px-5">
-          <FadeUp>
-            <h2 className="font-display text-3xl font-bold uppercase sm:text-4xl">
-              Let&apos;s build something reliable together
-            </h2>
-            <p className="mt-2 text-primary-foreground/80">
-              Contact us for a project consultation or emergency support.
-            </p>
-          </FadeUp>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Link
-              href="/contact"
-              className="inline-flex items-center gap-2 bg-navy px-7 py-3.5 text-sm font-semibold uppercase tracking-wide text-navy-foreground hover:opacity-90 transition-opacity"
-            >
-              Contact us
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </motion.div>
+/* ═══════════════════════════════════════
+   9. ABOUT
+═══════════════════════════════════════ */
+function About() {
+  return (
+    <section id="about" className="nt2-section-pad" style={{ padding: '7rem 0', background: 'var(--c-bg)' }}>
+      <div className="nt2-about-grid" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5rem', alignItems: 'center' }}>
+        {/* Left */}
+        <div className="reveal">
+          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: '1.5rem' }}>
+            <iconify-icon icon="solar:info-circle-linear" width="13" />
+            About Us
+          </p>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 3.8vw, 3.2rem)', fontWeight: 600, color: 'var(--c-deep)', margin: '0 0 1.75rem', lineHeight: 1.12 }}>
+            A trusted industrial services partner <em>in the UAE</em>
+          </h2>
+          <div style={{ width: 48, height: 3, background: 'linear-gradient(90deg, var(--c-primary), var(--c-muted))', borderRadius: 9999 }} />
         </div>
-      </section>
+
+        {/* Right */}
+        <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '1rem', lineHeight: 1.8, color: 'var(--c-fg)', margin: 0 }}>
+            Ocean Arms Technical Services LLC is a UAE-registered company providing specialised industrial and marine technical services to clients across Oil & Gas, Marine & Shipping, Power & Energy, and Civil & Construction sectors.
+          </p>
+          <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '1rem', lineHeight: 1.8, color: 'var(--c-fg)', margin: 0 }}>
+            With a highly skilled workforce of certified rope access technicians, industrial painters, blasters, and marine maintenance specialists, we handle complex scopes in some of the most challenging environments in the region.
+          </p>
+          <div style={{ borderLeft: '3px solid var(--c-primary)', paddingLeft: '1.25rem', marginTop: '0.5rem', background: 'var(--c-s100)', padding: '1.25rem 1.25rem 1.25rem 1.5rem', borderRadius: '0 1rem 1rem 0' }}>
+            <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 400, fontSize: '0.95rem', lineHeight: 1.7, color: 'var(--c-deep)', margin: 0 }}>
+              Our teams operate 24/7, with rapid mobilisation capability across the UAE and broader GCC region — ensuring clients' assets remain operational, compliant, and well-maintained.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+
+/* ═══════════════════════════════════════
+   12. FEATURES — Sticky Card Deck
+═══════════════════════════════════════ */
+const CARDS = [
+  {
+    icon: 'solar:shield-check-linear',
+    tag: 'Safety',
+    title: 'Safety First',
+    body: 'Zero-compromise HSSE culture on every site, every day.',
+    bg: '#0C2340',
+    color: '#F7FBFF',
+    accent: '#80B8D8',
+  },
+  {
+    icon: 'solar:star-linear',
+    tag: 'Excellence',
+    title: 'Excellence',
+    body: 'Raising the standard on every scope we deliver.',
+    bg: '#3580B1',
+    color: '#F7FBFF',
+    accent: '#C6DFF0',
+  },
+  {
+    icon: 'solar:diploma-linear',
+    tag: 'Integrity',
+    title: 'Integrity',
+    body: 'Transparent relationships built on trust and honesty.',
+    bg: '#EBF4FA',
+    color: '#0C2340',
+    accent: '#3580B1',
+  },
+  {
+    icon: 'solar:lightning-linear',
+    tag: 'Efficiency',
+    title: 'Efficiency',
+    body: 'Rapid mobilisation, sharp execution, zero downtime.',
+    bg: '#162D45',
+    color: '#F7FBFF',
+    accent: '#80B8D8',
+  },
+];
+
+function Features() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const deckRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef(0);
+  const rafRef = useRef<number>(0);
+
+  const hoveredCard = useRef<number | null>(null);
+
+  const animate = useCallback(() => {
+    const section = sectionRef.current;
+    const deck = deckRef.current;
+    if (!section || !deck) return;
+
+    // Mobile: static column layout — no scroll fan-out
+    if (window.innerWidth <= 768) return;
+
+    const rect = section.getBoundingClientRect();
+    const scrollable = section.offsetHeight - window.innerHeight;
+    const raw = Math.max(0, Math.min(1, -rect.top / scrollable));
+    progressRef.current = lerp(progressRef.current, raw, 0.07);
+    const p = progressRef.current;
+
+    const cards = deck.querySelectorAll<HTMLElement>('.feat-card');
+    const txMap    = [-310, -103, 103, 310];
+    const rotMap   = [-13, -4, 4, 13];
+    const scaleMap = [0.85, 0.93, 0.93, 0.85];
+    cards.forEach((card, i) => {
+      const tx    = p * txMap[i];
+      const rotZ  = p * rotMap[i];
+      const scale = scaleMap[i] + p * (1 - scaleMap[i]);
+      if (hoveredCard.current === i) {
+        card.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s';
+        card.style.transform = `translateX(${tx}px) rotateZ(0deg) scale(1)`;
+        card.style.zIndex = '20';
+        card.style.boxShadow = '0 32px 80px rgba(12,35,64,0.22)';
+      } else {
+        card.style.transition = 'box-shadow 0.3s';
+        card.style.transform = `translateX(${tx}px) rotateZ(${rotZ}deg) scale(${scale})`;
+        card.style.zIndex = String(i === 1 || i === 2 ? 10 : 2);
+        card.style.boxShadow = '0 24px 64px rgba(12,35,64,0.14)';
+      }
+    });
+
+    rafRef.current = requestAnimationFrame(animate);
+  }, []);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          rafRef.current = requestAnimationFrame(animate);
+        } else {
+          cancelAnimationFrame(rafRef.current);
+          rafRef.current = 0;
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(section);
+    return () => { observer.disconnect(); cancelAnimationFrame(rafRef.current); };
+  }, [animate]);
+
+  return (
+    <section id="pillars" ref={sectionRef} className="nt2-feat-section" style={{ height: '300vh', position: 'relative' }}>
+      <div className="nt2-feat-sticky" style={{ position: 'sticky', top: 0, height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        <div className="reveal nt2-feat-header" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-block', marginBottom: '1rem' }}>
+            Core Values
+          </p>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 500, color: 'var(--c-deep)', margin: 0 }}>
+            The principles behind <em>every scope we deliver</em>
+          </h2>
+        </div>
+
+        <div ref={deckRef} className="nt2-feat-deck" style={{ position: 'relative', width: 420, height: 360, perspective: '1200px' }}>
+          {CARDS.map(({ icon, tag, title, body, bg, color, accent }, i) => (
+            <div key={i} className="feat-card" style={{
+              background: bg,
+              boxShadow: '0 24px 64px rgba(12,35,64,0.14)',
+              padding: '3rem',
+              display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+              transformOrigin: 'bottom center',
+              cursor: 'pointer',
+            }}
+              onMouseEnter={() => { hoveredCard.current = i; }}
+              onMouseLeave={() => { hoveredCard.current = null; }}
+            >
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+                  <div style={{ width: 52, height: 52, borderRadius: '50%', background: `${accent}22`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <iconify-icon icon={icon} width="24" style={{ color: accent }} />
+                  </div>
+                  <span style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.6rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: accent, padding: '0.35rem 0.9rem', border: `1px solid ${accent}44`, borderRadius: 9999 }}>
+                    {tag}
+                  </span>
+                </div>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.55rem', fontWeight: 500, color, margin: '0 0 1rem' }}>{title}</h3>
+                <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.95rem', lineHeight: 1.7, color: `${color}cc`, margin: 0 }}>{body}</p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: '2rem' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.65rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: accent }}>
+                  {['Pillar 01', 'Pillar 02', 'Pillar 03', 'Pillar 04'][i]}
+                </span>
+                <div style={{ flex: 1, height: 1, background: `${accent}33` }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════
+   12. TESTIMONIALS
+═══════════════════════════════════════ */
+
+const VM_CARDS = [
+  {
+    icon: 'solar:eye-linear',
+    label: 'Vision',
+    tagline: 'Leading UAE marine & industrial excellence',
+    heading: 'To be the leading technical services provider in the UAE marine and industrial sector',
+    body: 'We aspire to build a reputation for excellence, reliability, and safety — becoming the partner of choice for asset owners and operators across the GCC and beyond.',
+    backBg: '#0C2340',
+    frontImage: '/assets/vm-vision-compass.png',
+  },
+  {
+    icon: 'solar:target-linear',
+    label: 'Mission',
+    tagline: 'Safe, compliant & high-quality delivery',
+    heading: 'What drives every decision we make',
+    body: 'To deliver safe, compliant, and high-quality services on every engagement — building long-term partnerships through reliability, technical excellence, and integrity in all client relationships.',
+    backBg: '#162D45',
+    frontImage: '/assets/vm-mission-target.png',
+  },
+];
+
+function Testimonials() {
+  const [flipped, setFlipped] = useState<string | null>(null);
+
+  return (
+    <section className="nt2-section-pad" style={{
+      background: 'var(--c-bg)',
+      padding: '7rem 0',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', position: 'relative', zIndex: 1 }}>
+        {/* Header */}
+        <div className="reveal" style={{ textAlign: 'center', marginBottom: '4.5rem' }}>
+          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-block', marginBottom: '1rem' }}>
+            Who We Are
+          </p>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 500, color: 'var(--c-deep)', margin: 0 }}>
+            Our <em>Vision & Mission</em>
+          </h2>
+        </div>
+
+        {/* Flip cards */}
+        <div className="nt2-vm-row" style={{ display: 'flex', gap: '2rem', justifyContent: 'center' }}>
+          {VM_CARDS.map(({ icon, label, tagline, heading, body, backBg, frontImage }) => (
+            <div
+              key={label}
+              className="reveal vm-flip nt2-vm-flip"
+              style={{ width: 340, flexShrink: 0, height: 520 }}
+              onClick={() => {
+                if (prefersHover) return;
+                setFlipped((prev) => (prev === label ? null : label));
+              }}
+            >
+              <div className={`vm-card${flipped === label ? ' is-flipped' : ''}`}>
+
+                {/* Front face — destination-style photo card */}
+                <div className="vm-face vm-front" style={{
+                  background: '#0C2340',
+                  border: 'none',
+                  boxShadow: '0 20px 48px rgba(12,35,64,0.16)',
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    backgroundImage: `url(${frontImage})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }} />
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: 'linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.12) 38%, rgba(0,0,0,0.55) 68%, rgba(0,0,0,0.78) 100%)',
+                  }} />
+
+                  <div style={{
+                    position: 'relative', zIndex: 1,
+                    padding: '1.5rem 1.35rem 1.35rem',
+                    display: 'flex', flexDirection: 'column', gap: '0.55rem',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                      <h3 style={{
+                        fontFamily: 'var(--font-display)', fontWeight: 600,
+                        fontSize: '1.55rem', color: '#FFFFFF', margin: 0, letterSpacing: '-0.01em',
+                      }}>
+                        Our {label}
+                      </h3>
+                      <iconify-icon icon={icon} width="20" style={{ color: 'rgba(255,255,255,0.9)' }} />
+                    </div>
+                    <p style={{
+                      fontFamily: 'var(--font-sans)', fontWeight: 400,
+                      fontSize: '0.82rem', color: 'rgba(247,251,255,0.78)',
+                      margin: '0 0 0.55rem', lineHeight: 1.4,
+                    }}>
+                      {tagline}
+                    </p>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      background: 'rgba(8,22,40,0.72)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '0.9rem',
+                      padding: '0.85rem 1.1rem',
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                    }}>
+                      <span style={{
+                        fontFamily: 'var(--font-display)', fontWeight: 500,
+                        fontSize: '0.88rem', color: '#FFFFFF',
+                      }}>
+                        Learn More
+                      </span>
+                      <iconify-icon icon="solar:alt-arrow-right-linear" width="18" style={{ color: '#FFFFFF' }} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Back face — description */}
+                <div className="vm-face vm-back" style={{
+                  background: backBg,
+                  backdropFilter: 'blur(24px)',
+                  WebkitBackdropFilter: 'blur(24px)',
+                  border: 'none',
+                  boxShadow: '0 32px 80px rgba(0,0,0,0.4)',
+                }}>
+                  <p style={{ fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.6rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#80B8D8', margin: 0 }}>
+                    {label}
+                  </p>
+                  <div style={{ width: 48, height: 1, background: 'rgba(128,184,216,0.35)', borderRadius: 9999 }} />
+                  <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1rem, 1.6vw, 1.35rem)', fontWeight: 500, color: '#F7FBFF', margin: 0, lineHeight: 1.4 }}>
+                    {heading}
+                  </h3>
+                  <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.92rem', lineHeight: 1.85, color: 'rgba(198,223,240,0.82)', margin: 0 }}>
+                    {body}
+                  </p>
+                </div>
+
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Touch hint for non-hover devices */}
+        <p style={{ textAlign: 'center', marginTop: '2.5rem', fontFamily: 'var(--font-display)', fontWeight: 400, fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--c-s300)' }}>
+          Tap each card to explore
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════
+   13. INDUSTRIES
+═══════════════════════════════════════ */
+const INDUSTRIES = [
+  { title: 'Oil & Gas',           href: '/industries/oil-and-gas',        image: '/assets/oil-gas.jpg',    icon: 'solar:oil-linear',         desc: 'Rope access inspection, maintenance, and support services for onshore and offshore oil and gas facilities throughout the GCC.' },
+  { title: 'Marine & Shipping',   href: '/industries/marine-and-shipping', image: '/assets/marine.jpg',     icon: 'solar:ship-linear',        desc: 'Ship repair support, vessel maintenance, hull cleaning, cargo hold cleaning, and specialist marine manpower across UAE ports.' },
+  { title: 'Power & Energy',      href: '/industries/power-and-energy',    image: '/assets/power.jpg',      icon: 'solar:lightning-linear',   desc: 'Power plant maintenance, shutdown support, heat exchanger cleaning, and structural services for conventional and renewable energy.' },
+  { title: 'Civil & Construction',href: '/industries/civil-and-construction',image: '/assets/civil-construction-site.png',   icon: 'solar:buildings-linear',   desc: 'High-rise facade maintenance, building cleaning, structural repairs, and specialist access services for commercial and industrial projects.' },
+  { title: 'Ship Designing',      href: '/industries/ship-designing',      image: '/assets/hero-ship.jpg',  icon: 'solar:ruler-pen-linear',   desc: 'Naval architecture and complete ship design services — from concept drawings and structural calculations to build-ready technical documentation for commercial and industrial vessels.' },
+];
+
+function Industries() {
+  return (
+    <section id="industries" className="nt2-section-pad" style={{ padding: '7rem 0', background: 'var(--c-s100)' }}>
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem' }}>
+        <div className="reveal" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-block', marginBottom: '1rem' }}>Industries We Serve</p>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 500, color: 'var(--c-deep)', margin: 0 }}>
+            Five sectors. <em>One multidisciplinary team.</em>
+          </h2>
+        </div>
+
+        {/* Featured left card + 2×2 right grid */}
+        <div className="nt2-industries-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gridTemplateRows: 'auto auto', gap: '1.5rem', alignItems: 'stretch' }}>
+
+          {/* Featured card — spans both rows */}
+          <a href={INDUSTRIES[0].href} className="reveal nt2-industries-featured" style={{
+            gridColumn: '1', gridRow: '1 / 3',
+            position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+            overflow: 'hidden', borderRadius: '1.75rem', minHeight: 520,
+            textDecoration: 'none', transition: 'transform 0.3s',
+          }}
+            onMouseEnter={(e) => { if (prefersHover) (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={INDUSTRIES[0].image} alt={INDUSTRIES[0].title} style={{
+              position: 'absolute', inset: 0, width: '100%', height: '100%',
+              objectFit: 'cover', transition: 'transform 0.6s',
+            }}
+              onMouseEnter={(e) => { if (prefersHover) e.currentTarget.style.transform = 'scale(1.05)'; }}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(12,35,64,0.92) 0%, rgba(12,35,64,0.45) 50%, transparent 100%)' }} />
+            <div style={{ position: 'relative', padding: '2.25rem' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 9999, padding: '0.3rem 0.85rem', marginBottom: '1rem' }}>
+                <iconify-icon icon={INDUSTRIES[0].icon} width="14" style={{ color: 'rgba(255,255,255,0.85)' }} />
+                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.62rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.85)' }}>Featured</span>
+              </div>
+              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.75rem', fontWeight: 600, color: '#fff', margin: '0 0 0.75rem', lineHeight: 1.2 }}>{INDUSTRIES[0].title}</h3>
+              <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.88rem', lineHeight: 1.7, color: 'rgba(255,255,255,0.72)', margin: '0 0 1.5rem' }}>{INDUSTRIES[0].desc}</p>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.15)', borderRadius: 9999, padding: '0.55rem 1.1rem', border: '1px solid rgba(255,255,255,0.25)' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.62rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#fff' }}>View services</span>
+                <iconify-icon icon="solar:arrow-right-linear" width="14" style={{ color: '#fff' }} />
+              </div>
+            </div>
+          </a>
+
+          {/* Regular cards — 2×2 on the right */}
+          {INDUSTRIES.slice(1).map(({ title, href, image, icon, desc }) => (
+            <a key={href} href={href} className="reveal" style={{
+              display: 'flex', flexDirection: 'column', overflow: 'hidden',
+              background: 'white', borderRadius: '1.75rem',
+              boxShadow: '0 12px 40px rgba(12,35,64,0.09)', border: '1px solid var(--c-s200)',
+              textDecoration: 'none', transition: 'box-shadow 0.3s, transform 0.3s',
+            }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 24px 64px rgba(12,35,64,0.16)'; if (prefersHover) (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)'; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 12px 40px rgba(12,35,64,0.09)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}
+            >
+              <div style={{ position: 'relative', height: 180, overflow: 'hidden' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={image} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.5s' }}
+                  onMouseEnter={(e) => { if (prefersHover) e.currentTarget.style.transform = 'scale(1.05)'; }}
+                  onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(12,35,64,0.4), transparent)' }} />
+              </div>
+              <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 600, color: 'var(--c-deep)', margin: '0 0 0.6rem' }}>{title}</h3>
+                <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '0.84rem', lineHeight: 1.65, color: 'var(--c-fg)', margin: '0 0 1rem', flex: 1 }}>{desc}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.6rem', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--c-primary)' }}>View services</span>
+                  <iconify-icon icon="solar:arrow-right-linear" width="14" style={{ color: 'var(--c-primary)' }} />
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════
+   13. WHY CHOOSE US
+═══════════════════════════════════════ */
+function WhyChoose() {
+  const points = [
+    { icon: 'solar:shield-check-linear', text: 'Certified rope access technicians' },
+    { icon: 'solar:clipboard-check-linear', text: 'Full HSSE compliance on every job' },
+    { icon: 'solar:clock-circle-linear', text: '24/7 emergency response capability' },
+    { icon: 'solar:users-group-rounded-linear', text: 'Single-source multidisciplinary team' },
+    { icon: 'solar:tuning-2-linear', text: 'Fully equipped with latest tooling' },
+    { icon: 'solar:graph-up-linear', text: 'Proven track record across GCC' },
+    { icon: 'solar:tag-price-linear', text: 'Competitive pricing with quality assurance' },
+    { icon: 'solar:rocket-linear', text: 'Rapid mobilisation and deployment' },
+    { icon: 'solar:case-round-linear', text: 'Experienced project management' },
+  ];
+  const clientSectors = [
+    'Building Contractors',
+    'Civil Construction Contractors',
+    'Major EPC Contractors',
+    'Offshore Operators',
+    'Marine & Shipyard Operators',
+    'Oil & Gas Operators',
+    'Power & Energy Contractors',
+    'Infrastructure Developers',
+  ];
+  return (
+    <section id="why-us" className="nt2-section-pad" style={{ padding: '7rem 0', background: 'var(--c-bg)', position: 'relative', overflow: 'hidden' }}>
+      <div aria-hidden="true" style={{
+        position: 'absolute', top: '10%', right: '-8%', width: 420, height: 420, borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(53,128,177,0.12) 0%, transparent 70%)', pointerEvents: 'none',
+      }} />
+      <div aria-hidden="true" style={{
+        position: 'absolute', bottom: '5%', left: '-6%', width: 360, height: 360, borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(128,184,216,0.14) 0%, transparent 70%)', pointerEvents: 'none',
+      }} />
+
+      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', position: 'relative', zIndex: 1 }}>
+        <div className="reveal" style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+          <p style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: '#3580B1', background: '#EBF4FA', border: '1px solid rgba(53,128,177,0.22)', borderRadius: '9999px', padding: '0.35rem 1rem', display: 'inline-block', marginBottom: '1rem' }}>Why Choose Us</p>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 500, color: 'var(--c-deep)', margin: 0 }}>
+            Strength across <em>every discipline</em>
+          </h2>
+        </div>
+
+        {/* Points grid */}
+        <div className="reveal nt2-why-grid" style={{
+          display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem',
+        }}>
+          {points.map(({ icon, text }, i) => (
+            <div
+              key={text}
+              style={{
+                display: 'flex', alignItems: 'flex-start', gap: '1rem',
+                padding: '1.35rem 1.4rem',
+                background: 'rgba(255,255,255,0.88)',
+                borderRadius: '1.15rem',
+                border: '1.5px solid rgba(53,128,177,0.32)',
+                boxShadow: '0 10px 28px rgba(53,128,177,0.18), 0 2px 8px rgba(12,35,64,0.06)',
+                transition: 'transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease',
+                cursor: 'default',
+              }}
+              onMouseEnter={(e) => {
+                if (!prefersHover) return;
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 18px 44px rgba(53,128,177,0.28), 0 4px 12px rgba(12,35,64,0.1)';
+                e.currentTarget.style.borderColor = 'rgba(53,128,177,0.55)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 10px 28px rgba(53,128,177,0.18), 0 2px 8px rgba(12,35,64,0.06)';
+                e.currentTarget.style.borderColor = 'rgba(53,128,177,0.32)';
+              }}
+            >
+              <div style={{
+                width: 44, height: 44, borderRadius: '0.85rem', flexShrink: 0,
+                background: 'linear-gradient(145deg, #EBF4FA 0%, #C6DFF0 100%)',
+                border: '1px solid rgba(53,128,177,0.2)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <iconify-icon icon={icon} width="20" style={{ color: 'var(--c-deep)' }} />
+              </div>
+              <div style={{ minWidth: 0, paddingTop: 2 }}>
+                <span style={{
+                  fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.58rem',
+                  letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--c-primary)',
+                  display: 'block', marginBottom: '0.35rem',
+                }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span style={{
+                  fontFamily: 'var(--font-sans)', fontWeight: 500, fontSize: '0.92rem',
+                  lineHeight: 1.45, color: 'var(--c-deep)', display: 'block',
+                }}>
+                  {text}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Sub-cards — matched to tile theme */}
+        <div className="nt2-why-sub" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+          {[
+            {
+              key: 'qa',
+              icon: 'solar:diploma-linear',
+              title: 'Quality Assurance',
+              body: 'All works carried out under strict HSSE guidelines with documented quality control processes, third-party inspection support, and full compliance with international standards.',
+              chips: ['HSSE Guidelines', 'QC Documentation', 'Third-Party Inspection', 'Intl. Standards'],
+            },
+            {
+              key: 'sectors',
+              icon: 'solar:buildings-linear',
+              title: 'Client Sectors',
+              body: 'Trusted across energy, marine, and infrastructure operators throughout the UAE and wider GCC.',
+              chips: clientSectors,
+            },
+          ].map(({ key, icon, title, body, chips }) => (
+            <div
+              key={key}
+              className="reveal"
+              style={{
+                background: 'rgba(255,255,255,0.92)',
+                borderRadius: '1.25rem',
+                padding: '1.75rem 1.85rem',
+                border: '1.5px solid rgba(53,128,177,0.32)',
+                boxShadow: '0 10px 28px rgba(53,128,177,0.18), 0 2px 8px rgba(12,35,64,0.06)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.1rem',
+                transition: 'transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (!prefersHover) return;
+                e.currentTarget.style.transform = 'translateY(-3px)';
+                e.currentTarget.style.boxShadow = '0 18px 44px rgba(53,128,177,0.28), 0 4px 12px rgba(12,35,64,0.1)';
+                e.currentTarget.style.borderColor = 'rgba(53,128,177,0.55)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 10px 28px rgba(53,128,177,0.18), 0 2px 8px rgba(12,35,64,0.06)';
+                e.currentTarget.style.borderColor = 'rgba(53,128,177,0.32)';
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{
+                  width: 46, height: 46, borderRadius: '0.85rem', flexShrink: 0,
+                  background: 'linear-gradient(145deg, #EBF4FA 0%, #C6DFF0 100%)',
+                  border: '1px solid rgba(53,128,177,0.22)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <iconify-icon icon={icon} width="22" style={{ color: 'var(--c-deep)' }} />
+                </div>
+                <div>
+                  <span style={{
+                    fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.58rem',
+                    letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--c-primary)',
+                    display: 'block', marginBottom: 4,
+                  }}>
+                    {key === 'qa' ? 'Standards' : 'Partners'}
+                  </span>
+                  <h3 style={{ fontFamily: 'var(--font-serif)', fontWeight: 600, fontSize: '1.2rem', color: 'var(--c-deep)', margin: 0 }}>
+                    {title}
+                  </h3>
+                </div>
+              </div>
+
+              <p style={{
+                fontFamily: 'var(--font-sans)', fontWeight: 400, fontSize: '0.9rem',
+                lineHeight: 1.7, color: 'var(--c-fg)', margin: 0,
+              }}>
+                {body}
+              </p>
+
+              <div style={{
+                height: 1, width: '100%',
+                background: 'linear-gradient(90deg, rgba(53,128,177,0.35), rgba(53,128,177,0.05))',
+              }} />
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {chips.map((chip) => (
+                  <span key={chip} style={{
+                    fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.62rem',
+                    letterSpacing: '0.1em', textTransform: 'uppercase',
+                    background: 'linear-gradient(145deg, #F7FBFF 0%, #EBF4FA 100%)',
+                    color: 'var(--c-deep)',
+                    padding: '0.5rem 0.9rem', borderRadius: 9999,
+                    border: '1px solid rgba(53,128,177,0.28)',
+                    boxShadow: '0 2px 8px rgba(53,128,177,0.1)',
+                  }}>
+                    {chip}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════
+   14. CTA BANNER
+═══════════════════════════════════════ */
+function CTABanner() {
+  return (
+    <section id="contact" style={{ background: 'var(--c-deep)', padding: '5rem 0', position: 'relative', overflow: 'hidden' }}>
+      {/* Subtle radial glow */}
+      <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 800, height: 400, background: 'radial-gradient(ellipse, rgba(53,128,177,0.18) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      <div className="nt2-cta-inner" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '2rem', position: 'relative', zIndex: 1 }}>
+        <div className="reveal">
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)', fontWeight: 500, color: '#F5F5F4', margin: '0 0 0.75rem', maxWidth: 560, lineHeight: 1.2 }}>
+            Let&apos;s build something <em>reliable together</em>
+          </h2>
+          <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 300, fontSize: '1rem', lineHeight: 1.65, color: 'rgba(245,245,244,0.65)', margin: 0 }}>
+            Contact us for a project consultation or emergency support.
+          </p>
+        </div>
+        <div className="reveal" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <a href="/contact" style={{
+            fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase',
+            background: 'var(--c-primary)', color: 'white', border: 'none', borderRadius: 9999,
+            padding: '1rem 2.25rem', cursor: 'pointer', textDecoration: 'none',
+            display: 'flex', alignItems: 'center', gap: 8,
+            boxShadow: '0 8px 32px rgba(53,128,177,0.35)', transition: 'transform 0.2s, opacity 0.2s',
+          }}
+            onMouseEnter={(e) => { if (prefersHover) (e.currentTarget as HTMLElement).style.transform = 'scale(1.04)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}>
+            <iconify-icon icon="solar:document-text-linear" width="16" />
+            Request a Quotation
+          </a>
+          <a href="tel:+971" style={{
+            fontFamily: 'var(--font-display)', fontWeight: 500, fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase',
+            background: 'transparent', color: 'rgba(245,245,244,0.85)', border: '1px solid rgba(255,255,255,0.2)',
+            borderRadius: 9999, padding: '1rem 2.25rem', cursor: 'pointer', textDecoration: 'none',
+            display: 'flex', alignItems: 'center', gap: 8, transition: 'border-color 0.2s',
+          }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.5)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.2)'; }}>
+            <iconify-icon icon="solar:phone-linear" width="16" />
+            Call Us 24/7
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════
+   PAGE ROOT
+═══════════════════════════════════════ */
+export default function HomePage() {
+  useReveal('.reveal');
+
+  return (
+    <>
+      <GlobalStyles />
+      <main>
+        <Hero />
+        <About />
+        <Features />
+        <Testimonials />
+        <Industries />
+        <Payment />
+        <WhyChoose />
+        <CTABanner />
+      </main>
     </>
   );
 }
+               

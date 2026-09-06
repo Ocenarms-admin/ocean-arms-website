@@ -4,40 +4,41 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const industries = [
-  { name: "Oil & Gas", href: "/industries/oil-and-gas" },
-  { name: "Marine & Shipping", href: "/industries/marine-and-shipping" },
-  { name: "Power & Energy", href: "/industries/power-and-energy" },
-  { name: "Civil & Construction", href: "/industries/civil-and-construction" },
-];
-
 const prefersHover =
   typeof window !== "undefined" &&
-  window.matchMedia("(hover: hover)").matches;
+  window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+const NAV_LINKS: [string, string][] = [
+  ["About", "/#about"],
+  ["Industries", "/#industries"],
+  ["Rope Access Service", "/#services"],
+  ["Services", "/#why-us"],
+];
 
 export default function NavbarV2() {
   const [pastHero, setPastHero] = useState(false);
-  const [industriesOpen, setIndustriesOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobileIndustriesOpen, setMobileIndustriesOpen] = useState(false);
   const pathname = usePathname();
 
-  const isLightPage = pathname.startsWith("/industries/") || pathname === "/contact";
+  // Contact / industry pages start on a light surface (no dark hero under the nav)
+  const isLightPage =
+    pathname.startsWith("/industries/") || pathname === "/contact";
+  const isLight = isLightPage || pastHero;
 
   useEffect(() => {
-    const onScroll = () => setPastHero(window.scrollY > window.innerHeight - 80);
+    const onScroll = () =>
+      setPastHero(window.scrollY > window.innerHeight - 80);
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
     setMobileOpen(false);
-    setMobileIndustriesOpen(false);
   }, [pathname]);
 
-  const isLight = isLightPage || pastHero;
-  const linkColor = isLight ? "#3A5270" : "rgba(247,251,255,0.85)";
-  const linkHoverColor = isLight ? "#0C2340" : "#ffffff";
+  const linkColor = isLight ? "#3A5270" : "rgba(247,251,255,0.95)";
+  const linkHoverColor = isLight ? "#0C2340" : "#F7FBFF";
 
   return (
     <>
@@ -48,17 +49,16 @@ export default function NavbarV2() {
           left: 0,
           right: 0,
           zIndex: 50,
-          height: 65,
+          height: 80,
           display: "flex",
           alignItems: "center",
-          background: isLight ? "#ffffff" : "rgba(12,35,64,0.82)",
+          background: isLight ? "#EBF4FA" : "transparent",
           transition: "background 0.4s ease",
-          boxShadow: isLight
-            ? "0 2px 12px rgba(0,0,0,0.06)"
-            : "0 2px 12px rgba(0,0,0,0.15)",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
         }}
       >
         <div
+          className="nt2-nav-inner"
           style={{
             maxWidth: 1280,
             margin: "0 auto",
@@ -72,38 +72,43 @@ export default function NavbarV2() {
           {/* Logo */}
           <Link
             href="/"
-            style={{ display: "flex", alignItems: "center", textDecoration: "none" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+            }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/assets/o-a-logo-bg-rmd (1).png"
+              className="nt2-nav-logo"
+              src={
+                isLight
+                  ? "/assets/o-a-logo-bg-rmd%20(1).png"
+                  : "/assets/o-a-logo-bg-light.png"
+              }
               alt="Ocean Arms Technical Services"
-              style={{ height: 62, width: "auto", objectFit: "contain" }}
+              style={{
+                height: 62,
+                width: "auto",
+                objectFit: "contain",
+                transition: "opacity 0.3s ease",
+              }}
             />
           </Link>
 
-          {/* Desktop nav */}
+          {/* Desktop links */}
           <div
-            style={{
-              display: "flex",
-              gap: "2.2rem",
-              alignItems: "center",
-            }}
             className="hidden lg:flex"
+            style={{ gap: "2.2rem", alignItems: "center" }}
           >
-            {(
-              [
-                ["About", "/#about"],
-                ["Services", "/#services"],
-                ["Contact", "/contact"],
-              ] as [string, string][]
-            ).map(([label, href]) => (
+            {NAV_LINKS.map(([label, href]) => (
               <Link
                 key={label}
                 href={href}
+                className="nt2-nav-links-text"
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontWeight: 500,
+                  fontWeight: 700,
                   fontSize: "0.7rem",
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
@@ -111,109 +116,19 @@ export default function NavbarV2() {
                   textDecoration: "none",
                   transition: "color 0.2s",
                 }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.color = linkHoverColor)
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.color = linkColor)
-                }
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = linkHoverColor;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = linkColor;
+                }}
               >
                 {label}
               </Link>
             ))}
-
-            {/* Industries dropdown */}
-            <div
-              style={{ position: "relative" }}
-              onMouseEnter={() => setIndustriesOpen(true)}
-              onMouseLeave={() => setIndustriesOpen(false)}
-            >
-              <button
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 500,
-                  fontSize: "0.7rem",
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  color: linkColor,
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  transition: "color 0.2s",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                  padding: 0,
-                }}
-              >
-                Industries
-                <svg
-                  width="10"
-                  height="6"
-                  viewBox="0 0 10 6"
-                  fill="none"
-                  style={{
-                    transition: "transform 0.2s",
-                    transform: industriesOpen ? "rotate(180deg)" : "rotate(0deg)",
-                    stroke: linkColor,
-                  }}
-                >
-                  <path
-                    d="M1 1l4 4 4-4"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-
-              {industriesOpen && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "calc(100% + 8px)",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    width: 230,
-                    background: "white",
-                    border: "1px solid rgba(53,128,177,0.12)",
-                    boxShadow: "0 8px 32px rgba(12,35,64,0.14)",
-                    overflow: "hidden",
-                  }}
-                >
-                  {industries.map((ind) => (
-                    <Link
-                      key={ind.href}
-                      href={ind.href}
-                      style={{
-                        display: "block",
-                        padding: "0.75rem 1.25rem",
-                        fontFamily: "var(--font-sans)",
-                        fontSize: "0.875rem",
-                        fontWeight: 400,
-                        color: "#3A5270",
-                        textDecoration: "none",
-                        transition: "background 0.15s, color 0.15s",
-                        borderBottom: "1px solid rgba(53,128,177,0.06)",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = "#EBF4FA";
-                        e.currentTarget.style.color = "#0C2340";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = "transparent";
-                        e.currentTarget.style.color = "#3A5270";
-                      }}
-                    >
-                      {ind.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-
             <Link
               href="/contact"
+              className="nt2-nav-cta"
               style={{
                 fontFamily: "var(--font-display)",
                 fontWeight: 600,
@@ -224,10 +139,12 @@ export default function NavbarV2() {
                 color: "white",
                 border: isLight ? "none" : "1px solid rgba(255,255,255,0.3)",
                 borderRadius: 9999,
-                padding: "0.65rem 1.6rem",
-                textDecoration: "none",
+                padding: "0.75rem 1.75rem",
+                cursor: "pointer",
                 transition: "background 0.2s, transform 0.15s",
-                display: "inline-block",
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "#3580B1";
@@ -258,12 +175,34 @@ export default function NavbarV2() {
             }}
           >
             {mobileOpen ? (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             )}
           </button>
@@ -275,7 +214,7 @@ export default function NavbarV2() {
         <div
           style={{
             position: "fixed",
-            top: 65,
+            top: 80,
             left: 0,
             right: 0,
             zIndex: 40,
@@ -294,19 +233,13 @@ export default function NavbarV2() {
               gap: 2,
             }}
           >
-            {(
-              [
-                ["About", "/#about"],
-                ["Services", "/#services"],
-                ["Contact", "/contact"],
-              ] as [string, string][]
-            ).map(([label, href]) => (
+            {NAV_LINKS.map(([label, href]) => (
               <Link
                 key={label}
                 href={href}
                 style={{
                   fontFamily: "var(--font-display)",
-                  fontWeight: 500,
+                  fontWeight: 700,
                   fontSize: "0.8rem",
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
@@ -319,71 +252,6 @@ export default function NavbarV2() {
                 {label}
               </Link>
             ))}
-
-            {/* Mobile industries */}
-            <button
-              onClick={() => setMobileIndustriesOpen(!mobileIndustriesOpen)}
-              style={{
-                fontFamily: "var(--font-display)",
-                fontWeight: 500,
-                fontSize: "0.8rem",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: "#3A5270",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: "0.65rem 0.75rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                width: "100%",
-                textAlign: "left",
-              }}
-            >
-              Industries
-              <svg
-                width="10"
-                height="6"
-                viewBox="0 0 10 6"
-                fill="none"
-                style={{
-                  transition: "transform 0.2s",
-                  transform: mobileIndustriesOpen ? "rotate(180deg)" : "rotate(0deg)",
-                }}
-              >
-                <path
-                  d="M1 1l4 4 4-4"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  stroke="#3A5270"
-                />
-              </svg>
-            </button>
-
-            {mobileIndustriesOpen && (
-              <div style={{ paddingLeft: "0.75rem" }}>
-                {industries.map((ind) => (
-                  <Link
-                    key={ind.href}
-                    href={ind.href}
-                    style={{
-                      display: "block",
-                      fontFamily: "var(--font-sans)",
-                      fontSize: "0.875rem",
-                      color: "#3A5270",
-                      textDecoration: "none",
-                      padding: "0.5rem 0.75rem",
-                      opacity: 0.75,
-                    }}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {ind.name}
-                  </Link>
-                ))}
-              </div>
-            )}
 
             <Link
               href="/contact"
