@@ -48,7 +48,7 @@ function Icon({ type, className }: { type: string; className?: string }) {
 
 const stats = [
   { value: "15",              label: "Service lines" },
-  { value: "Port→Anchorage",  label: "Coverage" },
+  { value: "Port →\nAnchorage",  label: "Coverage" },
   { value: "100%",            label: "Marine certified" },
   { value: "0",               label: "Safety compromise" },
 ];
@@ -156,13 +156,24 @@ export default function MarineShippingPage() {
       {/* ════ STATS ════ */}
       <section className="bg-surface py-16">
         <div className="mx-auto max-w-6xl px-6 lg:px-8">
-          <dl className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4">
-            {stats.map((s) => (
-              <FadeUp key={s.label}>
-                <dd className="font-display font-bold text-foreground" style={{ fontSize: "clamp(2rem,5vw,4.5rem)", lineHeight: 1 }}>{s.value}</dd>
-                <dt className="mt-2 text-[0.62rem] uppercase tracking-widest text-muted-foreground">{s.label}</dt>
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 sm:gap-x-8">
+            {stats.map((s) => {
+              const stacked = s.value.includes("\n");
+              return (
+              <FadeUp key={s.label} className="min-w-0 flex min-h-[7.75rem] flex-col text-center">
+                <dd
+                  className={`font-display font-bold text-foreground min-w-0${stacked ? " whitespace-pre-line" : ""}`}
+                  style={{
+                    fontSize: stacked || s.value.length > 6 ? "clamp(1.55rem, 2.8vw, 2.25rem)" : "clamp(2rem,5vw,4.5rem)",
+                    lineHeight: stacked ? 1.15 : 1.1,
+                  }}
+                >
+                  {s.value}
+                </dd>
+                <dt className="mt-auto pt-2 text-[0.62rem] uppercase tracking-widest text-muted-foreground">{s.label}</dt>
               </FadeUp>
-            ))}
+              );
+            })}
           </dl>
         </div>
       </section>

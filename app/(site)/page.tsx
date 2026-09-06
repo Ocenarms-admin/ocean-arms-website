@@ -330,43 +330,63 @@ function GlobalStyles() {
         }
       }
 
-      /* Laptop 1440: sticky 100vh clips the cards — show the full section instead */
+      /* Laptop 1440: keep scroll-scrub, compact so cards fit in 100vh */
       @media (min-width: 769px) and (max-width: 1440px) {
-        .nt2-services-section {
-          height: auto !important;
-        }
         .nt2-services-sticky {
-          position: relative !important;
-          height: auto !important;
-          overflow: visible !important;
           justify-content: flex-start !important;
-          padding: 5.25rem 1.75rem 3.25rem !important;
-          gap: 1.15rem !important;
+          padding: 4.25rem 1.5rem 0.7rem !important;
+          gap: 0.5rem !important;
         }
         .nt2-services-header {
           margin-top: 0 !important;
         }
+        .nt2-services-header-inner {
+          padding: 0.35rem 1rem 0.4rem !important;
+        }
+        .nt2-services-kicker {
+          margin-bottom: 0.18rem !important;
+          font-size: 0.6rem !important;
+        }
+        .nt2-services-title {
+          font-size: 1.7rem !important;
+        }
+        .nt2-services-rule {
+          margin-top: 0.4rem !important;
+        }
         .nt2-services-grid {
-          flex: none !important;
-          min-height: auto !important;
-          gap: 1.15rem !important;
+          gap: 0.85rem !important;
+        }
+        .nt2-services-card {
+          padding: 0.9rem 1.05rem !important;
+        }
+        .nt2-services-card-head {
+          margin-bottom: 0.35rem !important;
         }
         .nt2-service-row {
-          opacity: 1 !important;
-          transform: none !important;
+          gap: 0.5rem !important;
+          padding-bottom: 0.18rem !important;
         }
-        .nt2-services-grid .ms-item {
-          opacity: 1 !important;
+        .nt2-service-icon {
+          width: 26px !important;
+          height: 26px !important;
         }
-        .nt2-services-grid .ms-item .ms-dot {
-          background: var(--c-deep) !important;
-          transform: scale(1.25) !important;
+        .nt2-service-name {
+          font-size: 0.72rem !important;
         }
-        .nt2-services-grid .ms-item .ms-content {
-          opacity: 1 !important;
+        .nt2-service-desc {
+          font-size: 0.64rem !important;
+          line-height: 1.28 !important;
         }
-        .nt2-connector-fill {
-          transform: scaleY(1) !important;
+        .nt2-workflow-card {
+          padding: 0.85rem 1rem !important;
+        }
+        .nt2-workflow-title {
+          margin-bottom: 0.45rem !important;
+          font-size: 0.92rem !important;
+        }
+        .nt2-services-grid .ms-content p {
+          font-size: 0.7rem !important;
+          margin-top: 0.12rem !important;
         }
       }
 
@@ -678,8 +698,8 @@ function Payment() {
     const section = sectionRef.current;
     if (!section) return;
 
-    // Mobile / 1440 laptop: content stays static — no scroll scrubbing
-    if (window.innerWidth <= 1440) return;
+    // Mobile: content stays static — no scroll scrubbing
+    if (window.innerWidth <= 768) return;
 
     const rect = section.getBoundingClientRect();
     const scrollable = section.offsetHeight - window.innerHeight;
