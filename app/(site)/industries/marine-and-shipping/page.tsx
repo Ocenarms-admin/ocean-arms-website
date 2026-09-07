@@ -129,7 +129,7 @@ export default function MarineShippingPage() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.5 }}
           >
-            <Image src="/assets/marine.jpg" alt="Marine vessel in port" fill className="object-cover" priority />
+            <Image src="/assets/Ship-2.png" alt="Rope-access technicians working on a ship crane at sea" fill className="object-cover" priority />
             <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent" />
             <p className="absolute bottom-5 left-6 text-sm italic text-white/80">
               Vessel to dry dock, port to anchorage — same standard, any ship.

@@ -1029,7 +1029,7 @@ function About() {
           </p>
           <div style={{ borderLeft: '3px solid var(--c-primary)', paddingLeft: '1.25rem', marginTop: '0.5rem', background: 'var(--c-s100)', padding: '1.25rem 1.25rem 1.25rem 1.5rem', borderRadius: '0 1rem 1rem 0' }}>
             <p style={{ fontFamily: 'var(--font-sans)', fontWeight: 400, fontSize: '0.95rem', lineHeight: 1.7, color: 'var(--c-deep)', margin: 0 }}>
-              Our teams operate 24/7, with rapid mobilisation capability across the UAE and broader GCC region — ensuring clients' assets remain operational, compliant, and well-maintained.
+              Our teams operate 24/7, with rapid mobilisation capability across the world — ensuring clients' assets remain operational, compliant, and well-maintained.
             </p>
           </div>
         </div>
@@ -1356,7 +1356,7 @@ function Testimonials() {
 ═══════════════════════════════════════ */
 const INDUSTRIES = [
   { title: 'Oil & Gas',           href: '/industries/oil-and-gas',        image: '/assets/oil-gas.jpg',    icon: 'solar:oil-linear',         desc: 'Rope access inspection, maintenance, and support services for onshore and offshore oil and gas facilities throughout the GCC.' },
-  { title: 'Marine & Shipping',   href: '/industries/marine-and-shipping', image: '/assets/marine.jpg',     icon: 'solar:ship-linear',        desc: 'Ship repair support, vessel maintenance, hull cleaning, cargo hold cleaning, and specialist marine manpower across UAE ports.' },
+  { title: 'Marine & Shipping',   href: '/industries/marine-and-shipping', image: '/assets/Ship-2.png',     icon: 'solar:ship-linear',        desc: 'Ship repair support, vessel maintenance, hull cleaning, cargo hold cleaning, and specialist marine manpower across UAE ports.' },
   { title: 'Power & Energy',      href: '/industries/power-and-energy',    image: '/assets/power.jpg',      icon: 'solar:lightning-linear',   desc: 'Power plant maintenance, shutdown support, heat exchanger cleaning, and structural services for conventional and renewable energy.' },
   { title: 'Civil & Construction',href: '/industries/civil-and-construction',image: '/assets/civil-construction-site.png',   icon: 'solar:buildings-linear',   desc: 'High-rise facade maintenance, building cleaning, structural repairs, and specialist access services for commercial and industrial projects.' },
   { title: 'Ship Designing',      href: '/industries/ship-designing',      image: '/assets/ship-designing-sketch-to-ship.png',  icon: 'solar:ruler-pen-linear',   desc: 'Naval architecture and complete ship design services — from concept drawings and structural calculations to build-ready technical documentation for commercial and industrial vessels.' },
