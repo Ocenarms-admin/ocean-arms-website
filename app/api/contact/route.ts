@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const MAILBOX = "a.prakasan@oceanarms.ae";
-const fromAddress = process.env.MAIL_FROM || MAILBOX;
-const toAddress = process.env.CONTACT_TO_EMAIL || MAILBOX;
+const SENDER_MAILBOX = "a.prakasan@oceanarms.ae";
+const INBOX = "support@oceanarms.ae";
+const fromAddress = process.env.MAIL_FROM || SENDER_MAILBOX;
+const toAddress = process.env.CONTACT_TO_EMAIL || INBOX;
 const tenantId = process.env.MICROSOFT_TENANT_ID;
 const clientId = process.env.MICROSOFT_CLIENT_ID;
 const clientSecret = process.env.MICROSOFT_CLIENT_SECRET;
