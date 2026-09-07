@@ -10,6 +10,21 @@ const clientSecret = process.env.MICROSOFT_CLIENT_SECRET;
 
 const MAX_ATTACHMENT_BYTES = 3 * 1024 * 1024;
 
+type GraphAttachment = {
+  "@odata.type": "#microsoft.graph.fileAttachment";
+  name: string;
+  contentBytes: string;
+  contentType?: string;
+};
+
+type GraphMessage = {
+  subject: string;
+  body: { contentType: "HTML"; content: string };
+  toRecipients: Array<{ emailAddress: { address: string } }>;
+  replyTo?: Array<{ emailAddress: { address: string } }>;
+  attachments?: GraphAttachment[];
+};
+
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -50,6 +65,28 @@ async function getGraphToken() {
   return data.access_token;
 }
 
+async function sendGraphMail(token: string, message: GraphMessage, saveToSentItems: boolean) {
+  const sendRes = await fetch(
+    `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(fromAddress)}/sendMail`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message, saveToSentItems }),
+    },
+  );
+
+  if (!sendRes.ok) {
+    const errBody = (await sendRes.json().catch(() => null)) as {
+      error?: { code?: string; message?: string };
+    } | null;
+    console.error("[contact/route] Graph send error:", sendRes.status, errBody?.error);
+    throw new Error(errBody?.error?.code || `Graph send failed (${sendRes.status})`);
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
@@ -74,12 +111,7 @@ export async function POST(req: NextRequest) {
     const safePhone = phone ? escapeHtml(phone) : "";
     const safeMessage = escapeHtml(message);
 
-    const attachments: Array<{
-      "@odata.type": "#microsoft.graph.fileAttachment";
-      name: string;
-      contentBytes: string;
-      contentType?: string;
-    }> = [];
+    const attachments: GraphAttachment[] = [];
 
     if (file && file.size > 0) {
       if (file.size > MAX_ATTACHMENT_BYTES) {
@@ -95,20 +127,14 @@ export async function POST(req: NextRequest) {
     }
 
     const token = await getGraphToken();
-    const sendRes = await fetch(
-      `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(fromAddress)}/sendMail`,
+
+    await sendGraphMail(
+      token,
       {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: {
-            subject: `New enquiry from ${name}`,
-            body: {
-              contentType: "HTML",
-              content: `
+        subject: `New enquiry from ${name}`,
+        body: {
+          contentType: "HTML",
+          content: `
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a2e">
           <div style="background:#1a2744;padding:28px 32px;border-radius:8px 8px 0 0">
             <h1 style="margin:0;color:#fff;font-size:20px;font-weight:600">New Contact Enquiry</h1>
@@ -149,23 +175,47 @@ export async function POST(req: NextRequest) {
           </p>
         </div>
       `,
-            },
-            toRecipients: [{ emailAddress: { address: toAddress } }],
-            replyTo: [{ emailAddress: { address: email } }],
-            attachments,
-          },
-          saveToSentItems: true,
-        }),
+        },
+        toRecipients: [{ emailAddress: { address: toAddress } }],
+        replyTo: [{ emailAddress: { address: email } }],
+        attachments,
       },
+      true,
     );
 
-    if (!sendRes.ok) {
-      const errBody = (await sendRes.json().catch(() => null)) as {
-        error?: { code?: string; message?: string };
-      } | null;
-      console.error("[contact/route] Graph send error:", sendRes.status, errBody?.error);
-      throw new Error(errBody?.error?.code || `Graph send failed (${sendRes.status})`);
-    }
+    await sendGraphMail(
+      token,
+      {
+        subject: "Thank you for contacting Ocean Arms",
+        body: {
+          contentType: "HTML",
+          content: `
+        <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a2e">
+          <div style="background:#1a2744;padding:28px 32px;border-radius:8px 8px 0 0">
+            <h1 style="margin:0;color:#fff;font-size:20px;font-weight:600">Thank you for contacting us</h1>
+            <p style="margin:6px 0 0;color:rgba(255,255,255,0.55);font-size:13px">Ocean Arms Technical Services LLC</p>
+          </div>
+          <div style="background:#f8f9fb;padding:28px 32px;border-radius:0 0 8px 8px;border:1px solid #e5e7eb;border-top:none">
+            <p style="margin:0 0 16px;font-size:15px;color:#111827;line-height:1.6">Dear ${safeName},</p>
+            <p style="margin:0 0 16px;font-size:15px;color:#111827;line-height:1.6">
+              Thank you for contacting us. We have received your enquiry and will get back to you shortly.
+            </p>
+            <p style="margin:0;font-size:15px;color:#111827;line-height:1.6">
+              Kind regards,<br />
+              Ocean Arms Technical Services LLC
+            </p>
+          </div>
+          <p style="margin:16px 0 0;font-size:11px;color:#9ca3af;text-align:center">
+            This is an automated confirmation from oceanarms.ae
+          </p>
+        </div>
+      `,
+        },
+        toRecipients: [{ emailAddress: { address: email } }],
+        replyTo: [{ emailAddress: { address: toAddress } }],
+      },
+      false,
+    );
 
     return NextResponse.json({ success: true });
   } catch (err) {
