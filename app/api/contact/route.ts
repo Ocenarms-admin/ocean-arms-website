@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
+const MAILBOX = "support@oceanarms.ae";
+const smtpUser = process.env.SMTP_USER || process.env.GMAIL_USER || MAILBOX;
+const smtpPass = process.env.SMTP_PASS || process.env.GMAIL_APP_PASSWORD;
+const fromAddress = process.env.MAIL_FROM || MAILBOX;
+const toAddress = process.env.CONTACT_TO_EMAIL || MAILBOX;
+
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
+  host: process.env.SMTP_HOST || "smtp.office365.com",
+  port: Number(process.env.SMTP_PORT) || 587,
   secure: false,
+  requireTLS: true,
   auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
+    user: smtpUser,
+    pass: smtpPass,
   },
 });
 
@@ -25,6 +32,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
     }
 
+    if (!smtpPass) {
+      console.error("[contact/route] missing SMTP password");
+      return NextResponse.json({ error: "Mail is not configured." }, { status: 500 });
+    }
+
     // Build attachment array for nodemailer
     const attachments: nodemailer.SendMailOptions["attachments"] = [];
     if (file && file.size > 0) {
@@ -33,8 +45,8 @@ export async function POST(req: NextRequest) {
     }
 
     await transporter.sendMail({
-      from: `"Ocean Arms Website" <${process.env.GMAIL_USER}>`,
-      to: process.env.CONTACT_TO_EMAIL,
+      from: `"Ocean Arms Website" <${fromAddress}>`,
+      to: toAddress,
       replyTo: email,
       subject: `New enquiry from ${name}`,
       html: `
